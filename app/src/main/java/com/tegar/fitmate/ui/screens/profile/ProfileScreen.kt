@@ -10,6 +10,6 @@ import androidx.compose.ui.Alignment
 fun ProfileScreen(){
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-        Text("Home screen")
+        Text("Profile screen")
     }
 }

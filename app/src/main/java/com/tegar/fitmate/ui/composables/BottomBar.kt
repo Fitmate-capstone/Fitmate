@@ -9,6 +9,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import com.tegar.fitmate.R
 import com.tegar.fitmate.ui.model.NavigationItem
 import com.tegar.fitmate.ui.screens.routelist.ScreenRoute
 import com.tegar.fitmate.ui.theme.lightblue60
+import java.util.Locale
 
 @Composable
 fun BottomBar(
@@ -68,6 +70,13 @@ fun BottomBar(
 
 
                 selected = currentRoute == item.screen.route,
+                label = {
+                    Text(item.screen.route.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.ROOT
+                        ) else it.toString()
+                    })
+                },
                 onClick = {
                     navController.navigate(item.screen.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
@@ -92,24 +101,24 @@ fun BottomBar(
 
 
                             )
-                        if (currentRoute == item.screen.route) {
-                            Divider(
-                                color = lightblue60,
-                                thickness = 2.38.dp,
-                                modifier = Modifier
-                                    .width(23.dp)
-                                    .height(2.dp)
-                            )
-                        } else {
-                            Divider(
-                                color = Color.Transparent,
-                                thickness = 2.38.dp,
-                                modifier = Modifier
-                                    .width(23.dp)
-                                    .height(2.dp)
-                            )
-
-                        }
+//                        if (currentRoute == item.screen.route) {
+//                            Divider(
+//                                color = lightblue60,
+//                                thickness = 2.38.dp,
+//                                modifier = Modifier
+//                                    .width(23.dp)
+//                                    .height(2.dp)
+//                            )
+//                        } else {
+//                            Divider(
+//                                color = Color.Transparent,
+//                                thickness = 2.38.dp,
+//                                modifier = Modifier
+//                                    .width(23.dp)
+//                                    .height(2.dp)
+//                            )
+//
+//                        }
 
                     }
                 },

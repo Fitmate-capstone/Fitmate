@@ -10,6 +10,6 @@ import androidx.compose.ui.Alignment
 fun ExploreScreen(){
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-        Text("Home screen")
+        Text("Explore screen")
     }
 }

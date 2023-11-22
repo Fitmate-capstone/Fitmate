@@ -14,6 +14,6 @@ fun DetailWorkoutScreen(
     ) {
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-        Text("Home screen")
+        Text("detail screen $workoutId")
     }
 }
