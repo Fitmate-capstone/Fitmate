@@ -6,6 +6,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.tegar.fitmate.ui.theme.satoshiFontFamily
 
 @Composable
 fun HomeScreen(
@@ -15,6 +18,6 @@ fun HomeScreen(
     ) {
 
    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-       Text("Home screen")
+       Text("Trending Workout Wonders!", fontFamily =  satoshiFontFamily , fontWeight = FontWeight.Bold , fontSize = 16.sp)
    }
 }
