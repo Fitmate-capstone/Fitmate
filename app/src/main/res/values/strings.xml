@@ -6,6 +6,9 @@
     <string name="bottom_bar_profile">Profile</string>
     <string name="section_favorite_title">Trending Workout Wonders!</string>
     <string name="section_favorite_subtitle">Sculpt and energize with the latest fitness favorites!</string>
+    <string name="section_discover_title">Discover Your Fitness Playground</string>
+    <string name="section_discover_subtitle">Master basics with essential workouts for all levels</string>
+
     <string name="empty_exercise_message">Data empty for now</string>
     <string name="error_message">"Something Wrong with server"</string>
     <string name="loading_message">Loading"</string>

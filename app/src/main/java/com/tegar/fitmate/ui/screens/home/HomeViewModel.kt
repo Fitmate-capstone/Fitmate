@@ -2,7 +2,9 @@ package com.tegar.fitmate.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.model.Muscle
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +17,17 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
     val exrcisesState: StateFlow<UiState<List<Exercise>>>
         get() = _exrcisesState
 
+
+    private val _muscleTargetState : MutableStateFlow<UiState<List<Muscle>>> = MutableStateFlow(UiState.Loading)
+    val muscleTargetState : StateFlow<UiState<List<Muscle>>>
+        get() = _muscleTargetState
+
+
+    private val _activeMuscleId: MutableStateFlow<Int?> = MutableStateFlow(1)
+    val activeMuscleId: StateFlow<Int?>
+        get() = _activeMuscleId
+
+
     fun fetchAllRestaurants() {
         viewModelScope.launch {
             exerciseRepository.getAllExercise().catch { exception ->
@@ -24,4 +37,18 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
             }
         }
     }
+
+    fun fetchListMuscle() {
+        viewModelScope.launch {
+            exerciseRepository.getAllMuscleCategory().catch { exception ->
+                _muscleTargetState.value = UiState.Error(exception.message.orEmpty())
+            }.collect { muscle ->
+                _muscleTargetState.value = UiState.Success(muscle)
+            }
+        }
+    }
+    fun setActiveMuscleId(muscleId: Int) {
+        _activeMuscleId.value = muscleId
+    }
+
 }

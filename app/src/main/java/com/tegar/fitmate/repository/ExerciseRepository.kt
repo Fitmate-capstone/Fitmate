@@ -2,12 +2,15 @@ package com.tegar.fitmate.repository
 
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.model.Muscle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class ExerciseRepository {
 
     private val exercises = mutableListOf<Exercise>()
+    private val muscles= mutableListOf<Muscle>()
+
     init {
         if (exercises.isEmpty()) {
             FakeData.fakeExerciseData.forEach { exercise ->
@@ -28,10 +31,23 @@ class ExerciseRepository {
                 )
             }
         }
+
+        if (muscles.isEmpty()) {
+            FakeData.fakeMuscleData.forEach { muscle ->
+                muscles.add(muscle)
+
+            }
+        }
     }
+
     fun getAllExercise(): Flow<List<Exercise>> {
         return flowOf(exercises)
     }
+
+    fun getAllMuscleCategory(): Flow<List<Muscle>> {
+        return flowOf(muscles)
+    }
+
     companion object {
         @Volatile
         private var instance: ExerciseRepository? = null

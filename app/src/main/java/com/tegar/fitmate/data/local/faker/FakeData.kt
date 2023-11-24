@@ -7,12 +7,12 @@ import com.tegar.fitmate.data.model.Exercise
 
 object FakeData {
 
-    private val fakeMuscleData = listOf(
-        Muscle("Chest"),
-        Muscle("Full Body"),
-        Muscle("Legs"),
-        Muscle("Arms"),
-        Muscle("Back"),
+     val fakeMuscleData = listOf(
+        Muscle(id=1,"Chest"),
+        Muscle(id=2, "Full Body"),
+        Muscle(id= 3,"Legs"),
+        Muscle(id=4,"Arms"),
+        Muscle(id=5,"Back"),
 
         )
     private val fakeCategory = listOf(
