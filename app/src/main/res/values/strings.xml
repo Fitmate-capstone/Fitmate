@@ -4,4 +4,12 @@
     <string name="bottom_bar_explore">Explore</string>
     <string name="bottom_bar_schedule">Schedule</string>
     <string name="bottom_bar_profile">Profile</string>
+    <string name="section_favorite_title">Trending Workout Wonders!</string>
+    <string name="section_favorite_subtitle">Sculpt and energize with the latest fitness favorites!</string>
+    <string name="empty_exercise_message">Data empty for now</string>
+    <string name="error_message">"Something Wrong with server"</string>
+    <string name="loading_message">Loading"</string>
+    <string name="rating_format">%1$d%% Rating</string>
+    <string name="calori_format">%1$d Calori</string>
+
 </resources>
