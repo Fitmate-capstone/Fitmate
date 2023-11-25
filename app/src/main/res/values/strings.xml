@@ -12,7 +12,7 @@
     <string name="empty_exercise_message">Data empty for now</string>
     <string name="error_message">"Something Wrong with server"</string>
     <string name="loading_message">Loading"</string>
-    <string name="rating_format">%1$d%% Rating</string>
-    <string name="calori_format">%1$d Calori</string>
+    <string name="rating_format">%1$d%% Rate</string>
+    <string name="calori_format">%1$d Cal</string>
 
 </resources>

@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.flowOf
 class ExerciseRepository {
 
     private val exercises = mutableListOf<Exercise>()
+    private val exercisesByMuscle = mutableListOf<Exercise>()
+
     private val muscles= mutableListOf<Muscle>()
 
     init {
@@ -42,6 +44,11 @@ class ExerciseRepository {
 
     fun getAllExercise(): Flow<List<Exercise>> {
         return flowOf(exercises)
+    }
+
+    fun getWorkoutByIdMuscle(muscleId: Int): Flow<List<Exercise>> {
+        val exercisesByMuscle = exercises.filter { it.muscle.id == muscleId }
+        return flowOf(exercisesByMuscle)
     }
 
     fun getAllMuscleCategory(): Flow<List<Muscle>> {

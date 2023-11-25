@@ -122,7 +122,7 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
                    Row(horizontalArrangement  = Arrangement.spacedBy(8.dp)){
                        // Informasi Tambahan
                        ExerciseAdditionInformation(
-                           icon = Icons.Default.LocalFireDepartment,
+                           icon = Icons.Filled.LocalFireDepartment,
                            text = stringResource(id = R.string.calori_format, exercise.calEstimation),
                            iconTint = lightblue60
                        )
@@ -141,28 +141,6 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
 }
 
 
-@Composable
-fun ExerciseAdditionInformation(
-    icon: ImageVector,
-    text: String,
-    iconTint: Color
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(text = text ,  style = MaterialTheme.typography.labelSmall.copy(
-            color = Color.White,
-            fontWeight = FontWeight.Medium
-        ))
-    }
-}
 
 @Preview
 @Composable

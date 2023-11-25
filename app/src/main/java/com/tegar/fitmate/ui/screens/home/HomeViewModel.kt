@@ -18,6 +18,11 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
         get() = _exrcisesState
 
 
+    private val _discoverExerciseState: MutableStateFlow<UiState<List<Exercise>>> = MutableStateFlow(UiState.Loading)
+    val discoverExerciseState: StateFlow<UiState<List<Exercise>>>
+        get() = _discoverExerciseState
+
+
     private val _muscleTargetState : MutableStateFlow<UiState<List<Muscle>>> = MutableStateFlow(UiState.Loading)
     val muscleTargetState : StateFlow<UiState<List<Muscle>>>
         get() = _muscleTargetState
@@ -28,7 +33,7 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
         get() = _activeMuscleId
 
 
-    fun fetchAllRestaurants() {
+    fun fetchListWorkout() {
         viewModelScope.launch {
             exerciseRepository.getAllExercise().catch { exception ->
                 _exrcisesState.value = UiState.Error(exception.message.orEmpty())
@@ -38,8 +43,20 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
         }
     }
 
-    fun fetchListMuscle() {
+    fun fetchWorkoutListByIdMuscle(muscleId : Int) {
         viewModelScope.launch {
+            exerciseRepository.getWorkoutByIdMuscle(muscleId).catch { exception ->
+                _discoverExerciseState.value = UiState.Error(exception.message.orEmpty())
+            }.collect { exercises ->
+                _discoverExerciseState.value = UiState.Success(exercises)
+            }
+        }
+    }
+
+    fun fetchListMuscle() {
+
+        viewModelScope.launch {
+
             exerciseRepository.getAllMuscleCategory().catch { exception ->
                 _muscleTargetState.value = UiState.Error(exception.message.orEmpty())
             }.collect { muscle ->
@@ -48,7 +65,10 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
         }
     }
     fun setActiveMuscleId(muscleId: Int) {
+        _discoverExerciseState.value = UiState.Loading
+
         _activeMuscleId.value = muscleId
+
     }
 
 }

@@ -1,10 +1,16 @@
 package com.tegar.fitmate.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +31,7 @@ import com.tegar.fitmate.R
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.di.Injection
 import com.tegar.fitmate.ui.composables.Chip
+import com.tegar.fitmate.ui.composables.ExerciseGridCard
 import com.tegar.fitmate.ui.composables.ExerciseHorizontalCard
 import com.tegar.fitmate.ui.composables.ListSection
 import com.tegar.fitmate.ui.screens.ViewModelFactory
@@ -40,100 +47,140 @@ fun HomeScreen(
 
     ) {
     val activeMuscleId by viewModel.activeMuscleId.collectAsState()
-
-    LazyColumn(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = modifier.fillMaxSize(),
     ) {
-        item {
-            viewModel.exrcisesState.collectAsState(initial = UiState.Loading).value.let { uiState ->
-                when (uiState) {
-                    is UiState.Loading -> {
-                        Text(stringResource(id = R.string.loading_message))
-                        viewModel.fetchAllRestaurants()
+        LazyColumn(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+
+            item {
+                viewModel.exrcisesState.collectAsState(initial = UiState.Loading).value.let { uiState ->
+                    when (uiState) {
+                        is UiState.Loading -> {
+                            Text(stringResource(id = R.string.loading_message))
+                            viewModel.fetchListWorkout()
+                        }
+
+                        is UiState.Success -> {
+
+                            if (uiState.data.isEmpty()) {
+                                Text(stringResource(id = R.string.empty_exercise_message))
+                            } else {
+                                ListSection(
+                                    title = stringResource(id = R.string.section_favorite_title),
+                                    subtitle = stringResource(
+                                        id = R.string.section_favorite_subtitle
+                                    )
+                                ) {
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                        contentPadding = PaddingValues(horizontal = 16.dp),
+                                    ) {
+                                        items(uiState.data, key = { it.name }) { exercise ->
+                                            ExerciseHorizontalCard(exercise = exercise)
+                                        }
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                        is UiState.Error -> {
+                            Text(stringResource(id = R.string.error_message))
+                        }
                     }
 
-                    is UiState.Success -> {
+                }
+                viewModel.muscleTargetState.collectAsState(initial = UiState.Loading).value.let { uiState ->
+                    when (uiState) {
+                        is UiState.Loading -> {
+                            Text(stringResource(id = R.string.loading_message))
+                            viewModel.fetchListMuscle()
+                        }
 
-                        if (uiState.data.isEmpty()) {
-                            Text(stringResource(id = R.string.empty_exercise_message))
-                        } else {
-                            ListSection(
-                                title = stringResource(id = R.string.section_favorite_title),
-                                subtitle = stringResource(
-                                    id = R.string.section_favorite_subtitle
-                                )
-                            ) {
-                                LazyRow(
+                        is UiState.Success -> {
+
+                            if (uiState.data.isEmpty()) {
+                                Text(stringResource(id = R.string.empty_exercise_message))
+                            } else {
+                                ListSection(
+                                    title = stringResource(id = R.string.section_discover_title),
+                                    subtitle = stringResource(
+                                        id = R.string.section_discover_subtitle
+                                    )
+                                ) {
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                        contentPadding = PaddingValues(horizontal = 16.dp),
+                                    ) {
+
+                                        items(uiState.data, key = { it.id }) { muscle ->
+
+                                            Chip(id = muscle.id,
+                                                value = muscle.name,
+                                                isActive = activeMuscleId == muscle.id,
+
+                                                onChipClick = { viewModel.setActiveMuscleId(muscle.id) })
+                                        }
+                                    }
+                                }
+
+                            }
+
+
+                        }
+
+                        is UiState.Error -> {
+                            Text(stringResource(id = R.string.error_message))
+                        }
+
+                    }
+                }
+
+                viewModel.discoverExerciseState.collectAsState(initial = UiState.Loading).value.let { uiState ->
+                    when (uiState) {
+                        is UiState.Loading -> {
+                            Text(stringResource(id = R.string.loading_message))
+                            activeMuscleId?.let { viewModel.fetchWorkoutListByIdMuscle(it) }
+                        }
+
+                        is UiState.Success -> {
+
+                            if (uiState.data.isEmpty()) {
+                                Text(stringResource(id = R.string.empty_exercise_message))
+                            } else {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Adaptive(155.dp),
+                                    contentPadding = PaddingValues(16.dp),
                                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    contentPadding = PaddingValues(horizontal = 16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                    modifier = Modifier.height(400.dp)
                                 ) {
                                     items(uiState.data, key = { it.name }) { exercise ->
-                                        ExerciseHorizontalCard(exercise = exercise)
-                                    }
-                                }
-                            }
-                        }
-
-
-                    }
-
-                    is UiState.Error -> {
-                        Text(stringResource(id = R.string.error_message))
-                    }
-                }
-
-            }
-        }
-
-        item {
-
-            viewModel.muscleTargetState.collectAsState(initial = UiState.Loading).value.let { uiState ->
-                when (uiState) {
-                    is UiState.Loading -> {
-                        Text(stringResource(id = R.string.loading_message))
-                        viewModel.fetchListMuscle()
-                    }
-
-                    is UiState.Success -> {
-
-                        if (uiState.data.isEmpty()) {
-                            Text(stringResource(id = R.string.empty_exercise_message))
-                        } else {
-                            ListSection(
-                                title = stringResource(id = R.string.section_discover_title),
-                                subtitle = stringResource(
-                                    id = R.string.section_discover_subtitle
-                                )
-                            ) {
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    contentPadding = PaddingValues(horizontal = 16.dp),
-                                ) {
-
-                                    items(uiState.data, key = { it.id }) { muscle ->
-
-                                        Chip(id = muscle.id,
-                                            value = muscle.name,
-                                            isActive = activeMuscleId == muscle.id,
-
-                                            onChipClick = { viewModel.setActiveMuscleId(muscle.id) })
+                                        ExerciseGridCard(exercise = exercise)
                                     }
                                 }
                             }
 
+
                         }
 
-
+                        is UiState.Error -> {
+                            Text(stringResource(id = R.string.error_message))
+                        }
                     }
-
-                    is UiState.Error -> {
-                        Text(stringResource(id = R.string.error_message))
-                    }
-
                 }
+
+
             }
+
+
         }
     }
+
 }
 
