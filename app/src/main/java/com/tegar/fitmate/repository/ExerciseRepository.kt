@@ -4,6 +4,7 @@ import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 
 class ExerciseRepository {
@@ -18,6 +19,7 @@ class ExerciseRepository {
             FakeData.fakeExerciseData.forEach { exercise ->
                 exercises.add(
                     Exercise(
+                        exercise.id,
                         exercise.name,
                         exercise.rating,
                         exercise.level,
@@ -54,7 +56,12 @@ class ExerciseRepository {
     fun getAllMuscleCategory(): Flow<List<Muscle>> {
         return flowOf(muscles)
     }
+    fun getWorkoutById(workoutId: Long): Flow<Exercise> {
+        return flow {
 
+            emit(exercises.first { it.id == workoutId })
+        }
+    }
     companion object {
         @Volatile
         private var instance: ExerciseRepository? = null

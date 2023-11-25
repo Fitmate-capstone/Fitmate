@@ -14,5 +14,7 @@
     <string name="loading_message">Loading"</string>
     <string name="rating_format">%1$d%% Rate</string>
     <string name="calori_format">%1$d Cal</string>
+    <string name="search_label">Search by gesture or tool</string>
+    <string name="start_interactive_text">Start Interactive Mode</string>
 
 </resources>

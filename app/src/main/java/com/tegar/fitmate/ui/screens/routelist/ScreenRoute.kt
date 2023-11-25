@@ -10,7 +10,8 @@ sealed class ScreenRoute (val route : String) {
     object Schendule : ScreenRoute("schedule")
     object OnBoarding : ScreenRoute("onboarding")
 
-
+    val requiresBottomBar: Boolean
+        get() = this in listOf(Home, Profile, Explore,Schendule)
 
 
 }

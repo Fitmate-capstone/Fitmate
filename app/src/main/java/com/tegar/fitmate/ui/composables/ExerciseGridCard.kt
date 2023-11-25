@@ -1,6 +1,7 @@
 package com.tegar.fitmate.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,7 +44,7 @@ import com.tegar.fitmate.ui.theme.neutral80
 
 
 @Composable
-fun ExerciseGridCard(exercise: Exercise, modifier: Modifier = Modifier) {
+fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modifier: Modifier = Modifier) {
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -53,7 +54,9 @@ fun ExerciseGridCard(exercise: Exercise, modifier: Modifier = Modifier) {
 
         modifier = modifier
             .width(166.dp)
-            .height(197.dp)
+            .height(197.dp).clickable {
+                navigateToDetail(exercise.id)
+            }
     ) {
         Image(
             painter = painterResource(id = exercise.photo),
@@ -122,10 +125,10 @@ fun ExerciseGridCard(exercise: Exercise, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
-@Composable
-fun ExerciseGridCardPreview() {
-    FitmateTheme {
-        ExerciseGridCard(FakeData.fakeExerciseData[0])
-    }
-}
+//@Preview
+//@Composable
+//fun ExerciseGridCardPreview() {
+//    FitmateTheme {
+//        ExerciseGridCard(FakeData.fakeExerciseData[0])
+//    }
+//}

@@ -7,12 +7,12 @@ import com.tegar.fitmate.data.model.Exercise
 
 object FakeData {
 
-     val fakeMuscleData = listOf(
-        Muscle(id=1,"Chest"),
-        Muscle(id=2, "Full Body"),
-        Muscle(id= 3,"Legs"),
-        Muscle(id=4,"Arms"),
-        Muscle(id=5,"Back"),
+    val fakeMuscleData = listOf(
+        Muscle(id = 1, "Chest"),
+        Muscle(id = 2, "Full Body"),
+        Muscle(id = 3, "Legs"),
+        Muscle(id = 4, "Arms"),
+        Muscle(id = 5, "Back"),
 
         )
     private val fakeCategory = listOf(
@@ -23,6 +23,7 @@ object FakeData {
         )
     val fakeExerciseData = listOf(
         Exercise(
+            id = 1,
             name = "Lat Pulldown",
             rating = 4,
             level = 1,
@@ -40,6 +41,8 @@ object FakeData {
             photo = R.drawable.lat_pulldown
         ),
         Exercise(
+            id = 2,
+
             name = "Bench Press",
             rating = 5,
             level = 1,
@@ -57,6 +60,8 @@ object FakeData {
             photo = R.drawable.bench_press
         ),
         Exercise(
+            id = 3,
+
             name = "Push-ups",
             rating = 4,
             level = 2,
@@ -74,6 +79,8 @@ object FakeData {
             photo = R.drawable.push_up
         ),
         Exercise(
+            id = 4,
+
             name = "Squat",
             rating = 4,
             level = 3,

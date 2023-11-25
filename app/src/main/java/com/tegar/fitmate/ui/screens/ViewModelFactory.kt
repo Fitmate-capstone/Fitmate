@@ -3,6 +3,7 @@ package com.tegar.fitmate.ui.screens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.tegar.fitmate.repository.ExerciseRepository
+import com.tegar.fitmate.ui.screens.detailworkout.DetailWorkoutViewModel
 import com.tegar.fitmate.ui.screens.home.HomeViewModel
 
 class ViewModelFactory(private val repository: ExerciseRepository) :
@@ -12,6 +13,9 @@ class ViewModelFactory(private val repository: ExerciseRepository) :
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             return HomeViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(DetailWorkoutViewModel::class.java)) {
+            return DetailWorkoutViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }

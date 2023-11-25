@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 
 
 data class Exercise(
+    val id : Long,
     val name : String,
     val rating : Int,
     val level : Int,

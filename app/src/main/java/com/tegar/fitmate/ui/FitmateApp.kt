@@ -9,10 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.tegar.fitmate.ui.composables.AppBar
 import com.tegar.fitmate.ui.composables.BottomBar
 import com.tegar.fitmate.ui.screens.detailworkout.DetailWorkoutScreen
 import com.tegar.fitmate.ui.screens.explore.ExploreScreen
@@ -28,10 +31,27 @@ fun FitmateApp(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    Scaffold(bottomBar = {
-        if (currentRoute != null) {
-            BottomBar(navController = navController, currentRoute = currentRoute)
-        }
+    val routesWithBottomBar = listOf(
+        ScreenRoute.Home.route,
+        ScreenRoute.Profile.route,
+        ScreenRoute.Explore.route,
+        ScreenRoute.Schendule.route
+    )
+
+    Scaffold(
+        topBar = {
+
+            if (currentRoute == ScreenRoute.Home.route) {
+                AppBar()
+            }
+        },
+        bottomBar = {
+
+            if (currentRoute  in routesWithBottomBar ) {
+                if (currentRoute != null) {
+                    BottomBar(navController = navController, currentRoute = currentRoute)
+                }
+            }
     }) { paddingValue ->
         NavHost(
             navController = navController,
@@ -45,7 +65,9 @@ fun FitmateApp(
                     },
                 )
             }
-            composable(ScreenRoute.DetailWorkout.route) {
+            composable(ScreenRoute.DetailWorkout.route,                arguments = listOf(
+                navArgument("workoutId") { type = NavType.LongType }),
+            ) {
                 val workoutId = it.arguments?.getLong("workoutId") ?: -1L
                 val context = LocalContext.current
                 DetailWorkoutScreen(

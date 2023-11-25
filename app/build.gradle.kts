@@ -61,7 +61,11 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("io.coil-kt:coil:2.5.0")
+    implementation("io.coil-kt:coil-gif:2.5.0")
+    implementation("io.coil-kt:coil-video:2.5.0")
 
+    implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
    //Testing depedency
     testImplementation("junit:junit:4.13.2")

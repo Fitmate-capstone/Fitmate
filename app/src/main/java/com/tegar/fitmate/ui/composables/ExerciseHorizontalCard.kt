@@ -1,6 +1,7 @@
 package com.tegar.fitmate.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,10 +52,16 @@ import com.tegar.fitmate.ui.theme.neutral30
 
 
 @Composable
-fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
+fun ExerciseHorizontalCard(
+    exercise: Exercise, navigateToDetail: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
+            .clickable {
+                navigateToDetail(exercise.id)
+            }
             .width(300.dp)
             .height(140.dp)
     ) {
@@ -90,9 +97,10 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
                     // Informasi Kategori dan Target Otot
                     Text(
                         text = "${exercise.muscle.name} | ${exercise.category.name} ",
-                        style =  MaterialTheme.typography.labelMedium.copy(
+                        style = MaterialTheme.typography.labelMedium.copy(
                             color = neutral30
-                        ))
+                        )
+                    )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -109,7 +117,7 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
                 }
 
                 // Informasi di Bawah Card
-                Column(){
+                Column() {
                     // Nama Latihan
                     Text(
                         text = exercise.name,
@@ -119,21 +127,24 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = Modifier.height(9.dp))
 
-                   Row(horizontalArrangement  = Arrangement.spacedBy(8.dp)){
-                       // Informasi Tambahan
-                       ExerciseAdditionInformation(
-                           icon = Icons.Filled.LocalFireDepartment,
-                           text = stringResource(id = R.string.calori_format, exercise.calEstimation),
-                           iconTint = lightblue60
-                       )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        // Informasi Tambahan
+                        ExerciseAdditionInformation(
+                            icon = Icons.Filled.LocalFireDepartment,
+                            text = stringResource(
+                                id = R.string.calori_format,
+                                exercise.calEstimation
+                            ),
+                            iconTint = lightblue60
+                        )
 
-                       // Rating
-                       ExerciseAdditionInformation(
-                           icon = Icons.Filled.Star,
-                           text = stringResource(id = R.string.rating_format, exercise.rating),
-                           iconTint = lightblue60
-                       )
-                   }
+                        // Rating
+                        ExerciseAdditionInformation(
+                            icon = Icons.Filled.Star,
+                            text = stringResource(id = R.string.rating_format, exercise.rating),
+                            iconTint = lightblue60
+                        )
+                    }
                 }
             }
         }
@@ -141,11 +152,10 @@ fun ExerciseHorizontalCard(exercise: Exercise, modifier: Modifier = Modifier) {
 }
 
 
-
-@Preview
-@Composable
-fun ExerciseHorizontalCardPreview() {
-    FitmateTheme {
-        ExerciseHorizontalCard(FakeData.fakeExerciseData[0])
-    }
-}
+//@Preview
+//@Composable
+//fun ExerciseHorizontalCardPreview() {
+//    FitmateTheme {
+//        ExerciseHorizontalCard(FakeData.fakeExerciseData[0], )
+//    }
+//}

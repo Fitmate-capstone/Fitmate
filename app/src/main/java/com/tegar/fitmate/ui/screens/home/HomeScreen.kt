@@ -80,7 +80,7 @@ fun HomeScreen(
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                     ) {
                                         items(uiState.data, key = { it.name }) { exercise ->
-                                            ExerciseHorizontalCard(exercise = exercise)
+                                            ExerciseHorizontalCard(exercise = exercise ,     navigateToDetail = navigateToDetail)
                                         }
                                     }
                                 }
@@ -161,7 +161,7 @@ fun HomeScreen(
                                     modifier = Modifier.height(400.dp)
                                 ) {
                                     items(uiState.data, key = { it.name }) { exercise ->
-                                        ExerciseGridCard(exercise = exercise)
+                                        ExerciseGridCard(exercise = exercise , navigateToDetail)
                                     }
                                 }
                             }
