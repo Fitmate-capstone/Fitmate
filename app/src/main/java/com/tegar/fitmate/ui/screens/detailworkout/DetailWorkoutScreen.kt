@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -142,7 +143,7 @@ fun DetailContent(
                 ) {
                     Box(Modifier.padding(8.dp)) {
                         Icon(
-                            imageVector = Icons.Filled.Favorite,
+                            painterResource(id =R.drawable.ic_schendule_inactive ) ,
                             tint = neutral10,
                             contentDescription = "Scan Workout Equiment"
                         )
@@ -217,7 +218,7 @@ fun GifImage(
     Image(
 
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.gif_dummy).apply(block = {
+            ImageRequest.Builder(context).data(data = R.drawable.dummy_2).apply(block = {
                 size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
@@ -228,7 +229,7 @@ fun GifImage(
 }
 
 @Composable
-fun WorkoutTutorial() {
+fun WorkoutTutorial(modifier : Modifier = Modifier) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     val tabTitles = listOf("Animation", "Video")
@@ -243,7 +244,10 @@ fun WorkoutTutorial() {
                     color = lightblue60,
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
                 )
-            }
+            },
+            modifier = Modifier.padding(
+                horizontal = 60.dp
+            )
         ) {
             // Create tabs
             tabTitles.forEachIndexed { index, title ->
@@ -263,10 +267,13 @@ fun WorkoutTutorial() {
         }
 
         // Content based on selected tab
-        when (selectedTabIndex) {
-            0 -> GifImage()
-            1 -> WorkoutVideo()
+        Box(modifier.padding(16.dp)){
+            when (selectedTabIndex) {
+                0 -> GifImage()
+                1 -> WorkoutVideo()
+            }
         }
+
     }
 }
 

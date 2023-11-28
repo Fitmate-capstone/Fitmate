@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "844776645166",
+    "project_id": "fitmate-c8240",
+    "storage_bucket": "fitmate-c8240.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844776645166:android:8af3098126575dc5fc75bf",
+        "android_client_info": {
+          "package_name": "com.tegar.fitmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiueDlfyjETSop_ftJYHP-GF3UYuxjQEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
