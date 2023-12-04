@@ -34,6 +34,7 @@ import com.tegar.fitmate.ui.screens.routelist.ScreenRoute
 import com.tegar.fitmate.ui.screens.schendule.SchenduleScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.tegar.fitmate.ui.screens.interactivelearn.InteractiveLearnScreen
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
 import kotlinx.coroutines.launch
 
@@ -42,8 +43,8 @@ import kotlinx.coroutines.launch
 fun FitmateApp(
     navController: NavHostController = rememberNavController(),
     googleAuthUiClient: GoogleAuthClient,
-    onSignInClick : () -> Unit,
-    onLogoutClick : () -> Unit
+    onSignInClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -92,12 +93,32 @@ fun FitmateApp(
                 DetailWorkoutScreen(
                     workoutId = workoutId,
                     navigateBack = { navController.navigateUp() },
+                    navigateToInteractiveArea = { workoutId ->
+                        navController.navigate(ScreenRoute.InteractiveLearn.createRoute(workoutId))
+
+                    }
                 )
             }
 
             composable(ScreenRoute.Explore.route) {
 
                 ExploreScreen()
+            }
+            composable(
+                ScreenRoute.InteractiveLearn.route,
+                arguments = listOf(
+                    navArgument("workoutId") { type = NavType.LongType }),
+            ) {
+                val workoutId = it.arguments?.getLong("workoutId") ?: -1L
+                val context = LocalContext.current
+                InteractiveLearnScreen(
+                    workoutId = workoutId,
+                    navigateBack = { navController.navigateUp() },
+                )
+            }
+            composable(ScreenRoute.Schendule.route) {
+
+                SchenduleScreen()
             }
             composable(ScreenRoute.Schendule.route) {
 

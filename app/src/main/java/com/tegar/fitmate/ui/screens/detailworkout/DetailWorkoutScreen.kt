@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,22 +27,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flip
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,10 +80,13 @@ import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
 import com.tegar.fitmate.ui.util.formatSteps
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailWorkoutScreen(
     workoutId: Long,
     navigateBack: () -> Unit,
+    navigateToInteractiveArea:  (Long) -> Unit,
+
     viewModel: DetailWorkoutViewModel = viewModel(
         factory = ViewModelFactory(
             Injection.provideRepository()
@@ -99,7 +108,8 @@ fun DetailWorkoutScreen(
 
             DetailContent(
                 navigateBack,
-                data
+                data,
+                navigateToInteractiveArea
 
             )
         }
@@ -111,15 +121,24 @@ fun DetailWorkoutScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailContent(
     navigateBack: () -> Unit,
     exercise: Exercise,
+    navigateToInteractiveArea : (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val sheetState = rememberModalBottomSheetState()
+    var isSheetOpen by rememberSaveable {
+        mutableStateOf(false)
+    }
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
+
+
+
         Column(
             Modifier
                 .padding(horizontal = 16.dp)
@@ -140,12 +159,17 @@ fun DetailContent(
                 Surface(
                     color = neutral80,
                     shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.clickable {
+                        isSheetOpen = true
+
+                    }
                 ) {
                     Box(Modifier.padding(8.dp)) {
                         Icon(
-                            painterResource(id =R.drawable.ic_schendule_inactive ) ,
+                            painterResource(id = R.drawable.ic_schendule_inactive),
                             tint = neutral10,
-                            contentDescription = "Scan Workout Equiment"
+
+                            contentDescription = "Schendule to learn this"
                         )
                     }
 
@@ -157,7 +181,27 @@ fun DetailContent(
 
 
         }
-        AnimatedVisibility(   visible = true,
+
+        if(isSheetOpen){
+            ModalBottomSheet(
+                containerColor = neutral80,
+                contentColor = neutral10,
+                sheetState =sheetState ,
+                onDismissRequest = {
+                    isSheetOpen = false
+                }) {
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+                Text("Schendule to learn this")
+
+            }
+        }
+        AnimatedVisibility(
+            visible = true,
             enter = fadeIn() + slideInVertically(),
             exit = fadeOut() + slideOutVertically(),
             modifier = Modifier
@@ -170,9 +214,11 @@ fun DetailContent(
                 )
                 .fillMaxWidth()
 
-                .align(Alignment.BottomStart)) {
+                .align(Alignment.BottomStart)
+        ) {
             FilledTonalButton(
                 onClick = {
+                    navigateToInteractiveArea(exercise.id)
                 },
                 elevation = ButtonDefaults.buttonElevation(
                     defaultElevation = 2.dp
@@ -229,7 +275,7 @@ fun GifImage(
 }
 
 @Composable
-fun WorkoutTutorial(modifier : Modifier = Modifier) {
+fun WorkoutTutorial(modifier: Modifier = Modifier) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     val tabTitles = listOf("Animation", "Video")
@@ -267,7 +313,7 @@ fun WorkoutTutorial(modifier : Modifier = Modifier) {
         }
 
         // Content based on selected tab
-        Box(modifier.padding(16.dp)){
+        Box(modifier.padding(16.dp)) {
             when (selectedTabIndex) {
                 0 -> GifImage()
                 1 -> WorkoutVideo()
