@@ -3,8 +3,12 @@ package com.tegar.fitmate.ui.screens.interactivelearn
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Paint.Align
+import android.media.Image
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.HandlerThread
+import android.provider.CalendarContract.Colors
 import android.util.Log
 import android.util.Size
 import android.view.ViewGroup
@@ -32,22 +36,34 @@ import androidx.camera.core.impl.ImageAnalysisConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.StayCurrentLandscape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,28 +74,51 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import com.tegar.fitmate.R
+import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.util.UiState
+import com.tegar.fitmate.di.Injection
 import com.tegar.fitmate.ml.KeyPointAnalyzer
 import com.tegar.fitmate.ml.PoseDetectorProcessor
 import com.tegar.fitmate.ui.model.BodyPart
 import com.tegar.fitmate.ui.model.KeyPoint
 import com.tegar.fitmate.ui.model.Person
+import com.tegar.fitmate.ui.screens.ViewModelFactory
+import com.tegar.fitmate.ui.screens.detailworkout.DetailContent
+import com.tegar.fitmate.ui.screens.detailworkout.DetailWorkoutViewModel
 import com.tegar.fitmate.ui.theme.lightblue60
+import com.tegar.fitmate.ui.theme.neutral10
+import com.tegar.fitmate.ui.theme.neutral80
 import com.tegar.fitmate.ui.tracker.PoseClassifier
 import com.tegar.fitmate.ui.tracker.VisualizationUtils
 import kotlinx.coroutines.Job
@@ -94,52 +133,174 @@ import kotlin.math.atan2
 fun InteractiveLearnScreen(
     workoutId: Long,
     navigateBack: () -> Unit,
-) {
+    viewModel: InteractiveLearnViewModel = viewModel(
+        factory = ViewModelFactory(
+            Injection.provideRepository()
+        )
+    ),
+
+    ) {
     var lens by remember { mutableStateOf(CameraSelector.LENS_FACING_FRONT) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
+    val exerciseState by viewModel.exercise.collectAsState(initial = UiState.Loading)
+    val soundplayState by viewModel.canPlaySound.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val onCounting by viewModel.onCounting.collectAsState()
 
-    when (configuration.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> {
-            Row {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                ) {
-                    CameraPreview(
-                        cameraLens = lens
-                    )
-
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f).clickable {
-
-                        },
-                    contentAlignment = Alignment.CenterEnd,
-
-                ) {
-                    Text("Hello")
-                }
-            }
-            ScoreBox()
+    when (exerciseState) {
+        is UiState.Loading -> {
+            viewModel.getWorkoutById(workoutId)
 
         }
 
-        else -> {
-            Column {
-                Text(" Please change to landscape mode")
+        is UiState.Success -> {
+            val data = (exerciseState as UiState.Success<Exercise>).data
+            when (configuration.orientation) {
+                Configuration.ORIENTATION_LANDSCAPE -> {
+                    Row {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                        ) {
+                            CameraPreview(
+                                exercise = data,
+                                canPlaySound = soundplayState,
+
+                                playSound = {
+                                    viewModel.playSound()
+                                },
+                                resetTimerSound = {
+                                    viewModel.resetTimer()
+                                },
+                                updateCounter = {
+                                    viewModel.increaseCount()
+                                },
+                                isSafeZone = uiState.isTutorialScreen,
+                                cameraLens = lens
+                            )
+
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(
+                                    start = 50.dp
+                                ),
+
+
+                            ) {
+
+
+                            if (uiState.isTutorialScreen && !onCounting) {
+                                Column(
+
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tutorial_1),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                    )
+                                    Text("For optimal calculations, ensure your smartphone aligns with the illustration above.\n" , style = MaterialTheme.typography.bodyMedium )
+                                    FilledTonalButton(
+                                        onClick = {
+                                            viewModel.startTimer()
+                                        },
+                                        elevation = ButtonDefaults.buttonElevation(
+                                            defaultElevation = 2.dp
+                                        ),
+                                        shape = RoundedCornerShape(12.dp),
+                                        contentPadding = PaddingValues(
+                                            vertical = 14.dp,
+                                            horizontal = 49.dp
+                                        ),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = neutral80,
+                                            contentColor = neutral10
+                                        ),
+                                        modifier=  Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            "Next",
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontFamily = FontFamily.Default,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        )
+                                    }
+                                }
+
+                            }else if(onCounting){
+                                Column {
+
+//
+                                    Text(viewModel.currentTimeString)
+                                }
+                            }else{
+                                Column {
+
+//                                    GifImage()
+                                    Text(uiState.counter.toString())
+                                }
+                            }
+
+
+                        }
+                    }
+                    ScoreBox()
+
+                }
+
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Filled.StayCurrentLandscape,
+                            contentDescription = null,
+                            Modifier.size(90.dp)
+                        )
+                        Text(
+                            text = " Rotate your device to landscape mode to enjoy this feature.\n",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        )
+                    }
+                }
             }
+        }
+
+        is UiState.Error -> {
+            Text(stringResource(id = R.string.error_message))
         }
     }
 
 
 }
 
+/*
+    isSafeZone: While still in tutorial mode or rest mode
+ */
 @Composable
 fun CameraPreview(
+    exercise: Exercise,
+    canPlaySound: Boolean,
+    playSound: () -> Unit,
+    resetTimerSound: () -> Unit,
+    isSafeZone : Boolean,
+    updateCounter : () -> Unit,
     modifier: Modifier = Modifier,
     cameraLens: Int
 ) {
@@ -149,7 +310,12 @@ fun CameraPreview(
     var detectedPose by remember { mutableStateOf<Pose?>(null) }
     val previewView = remember { PreviewView(context) }
     var isThumbsUp by remember { mutableStateOf(false) }
-    var rightHipAngle by remember { mutableStateOf(0.0) }
+    var rightArmAngle by remember { mutableStateOf(0.0) }
+    var leftArmAngle by remember { mutableStateOf(0.0) }
+    var leftFootAngle by remember { mutableStateOf(0.0) }
+    var rightFootAngle by remember { mutableStateOf(0.0) }
+    var counter by remember { mutableStateOf(0.0) }
+
     var isHumanDetected by remember { mutableStateOf(false) }
     var borderColor by remember { mutableStateOf(Color.Green) }
     val cameraProvider = remember(sourceInfo, cameraLens) {
@@ -160,21 +326,24 @@ fun CameraPreview(
                 onPoseDetected = { detectedPose = it }
             )
     }
+
+    Log.d("rightArmAngle", rightArmAngle.toString())
     val soundEffect: MediaPlayer = MediaPlayer.create(context, R.raw.correct).apply {
         setVolume(1.0f, 1.0f)
     }
-    var canPlaySound by remember { mutableStateOf(true) }
 
-    if (rightHipAngle > 10 && canPlaySound) {
-        soundEffect.start()
-        canPlaySound = false
+    if(!isSafeZone){
+        LaunchedEffect(key1 = areBodyPartsActive(exercise,rightArmAngle,leftArmAngle,rightFootAngle,leftFootAngle) && !isSafeZone ){
 
-
-        LaunchedEffect(Unit) {
-            delay(2000)
-            canPlaySound = true
+            delay(800)
+            soundEffect.start()
+            updateCounter()
         }
     }
+
+
+
+
 
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
@@ -197,23 +366,78 @@ fun CameraPreview(
             )
             {
                 CameraPreview(previewView)
-                DetectedPose(pose = detectedPose, sourceInfo = sourceInfo) { angle ->
-                    Log.d("angle" , angle.toString())
-                    if(angle != 0.0){
-                        isHumanDetected = true // Set to true when human is detected
-                        rightHipAngle = angle
+                DetectedPose(
+                    pose = detectedPose,
+                    sourceInfo = sourceInfo,
+                    onRightArmChange = { angle ->
+                        rightArmAngle = angle
 
-                    }else{
-                        isHumanDetected = false
+                    },
+                    onLeftArmChange = { angle ->
+                        leftArmAngle = angle
+                    },
+                    onLeftFootChange = {angle ->
+                        leftFootAngle  = angle
+
+                    },
+                    onRightFootChange ={angle ->
+                        rightFootAngle = angle
+
                     }
-                }
-                ColoredBorderBox(
-                    modifier = Modifier.fillMaxSize(),
-                    borderColor = if (rightHipAngle < 10) Color.Green else Color.Red
+
                 )
+
+                if(isSafeZone){
+                    ColoredBorderBox(
+                        modifier = Modifier.fillMaxSize(),
+                        borderColor = lightblue60
+                    )
+                }else{
+                    ColoredBorderBox(
+                        modifier = Modifier.fillMaxSize(),
+                        borderColor = if (areBodyPartsActive(exercise,rightArmAngle,leftArmAngle,rightFootAngle,leftFootAngle)) Color.Green else Color.Red
+                    )
+                }
+
+
+
             }
         }
     }
+}
+fun areBodyPartsActive(exercise: Exercise , rightArmAngle: Double,leftArmAngle: Double,rightFootAngle : Double,leftFootAngle: Double): Boolean {
+    return exercise.bodyPartNeeded.all { bodyPart ->
+        when (bodyPart) {
+            "right_hand" -> isBodyPartActive(
+                exercise.interctiveBodyPartSegmentValue.rightArm,
+                rightArmAngle
+            )
+            "left_hand" -> isBodyPartActive(
+                exercise.interctiveBodyPartSegmentValue.leftArm,
+                leftArmAngle
+            )
+            "right_leg" -> isBodyPartActive(
+                exercise.interctiveBodyPartSegmentValue.rightLeg,
+                rightFootAngle
+            )
+            "left_leg" -> isBodyPartActive(
+                exercise.interctiveBodyPartSegmentValue.leftLeg,
+                leftFootAngle
+            )
+            else -> false
+        }
+    }
+}
+fun isBodyPartActive(requiredValue: Double, detectedValue: Double): Boolean {
+    val angleTolerance = 10.0
+
+    return requiredValue != 0.0 && isWithinTolerance(detectedValue, requiredValue, angleTolerance)
+}
+
+fun isWithinTolerance(detectedAngle: Double, requiredAngle: Double, tolerance: Double): Boolean {
+    val lowerBound = requiredAngle - tolerance
+    val upperBound = requiredAngle + tolerance
+    return detectedAngle in lowerBound..upperBound
 }
 
 @Composable
@@ -226,18 +450,47 @@ private fun ColoredBorderBox(
             .border(1.dp, borderColor) // Border color and width
     )
 }
+@Composable
+fun GifImage(
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
+    Image(
 
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = R.drawable.dummy_2_nobg).apply(block = {
+                size(coil.size.Size.ORIGINAL)
+            }).build(), imageLoader = imageLoader
+        ),
+        contentDescription = null,
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+    )
+
+}
 @Composable
 fun DetectedPose(
     pose: Pose?,
     sourceInfo: SourceInfo,
-    onRightHipAngleChange: (Double) -> Unit
-
+    onRightArmChange: (Double) -> Unit,
+    onLeftArmChange: (Double) -> Unit,
+    onLeftFootChange : (Double) -> Unit,
+    onRightFootChange: (Double) -> Unit
 ) {
     var isThumbsUp by remember { mutableStateOf(false) }
 
     if (pose != null) {
-        if(pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER) != null) {
+        if (pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER) != null) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val strokeWidth = 1.dp.toPx()
                 val primaryPaint = SolidColor(lightblue60)
@@ -318,32 +571,50 @@ fun DetectedPose(
                 drawLine(rightHeel, rightFootIndex, primaryPaint)
 
 
-                val rightHipAngle = getAngle(
-                    pose.getPoseLandmark(PoseLandmark.NOSE),
-                    pose.getPoseLandmark(PoseLandmark.LEFT_KNEE),
-                    pose.getPoseLandmark(PoseLandmark.RIGHT_FOOT_INDEX)
-                )
 
                 val right = getAngle(
                     pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER),
                     pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW),
                     pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
                 )
+                val left = getAngle(
+                    pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER),
+                    pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW),
+                    pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
+                )
+                val rightFoot = getAngle(
+                    pose.getPoseLandmark(PoseLandmark.RIGHT_HIP),
+                    pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE),
+                    pose.getPoseLandmark(PoseLandmark.RIGHT_FOOT_INDEX)
+                )
+                val leftFoot = getAngle(
+                    pose.getPoseLandmark(PoseLandmark.LEFT_HIP),
+                    pose.getPoseLandmark(PoseLandmark.LEFT_KNEE),
+                    pose.getPoseLandmark(PoseLandmark.LEFT_FOOT_INDEX)
+                )
+                val fullBody = getAngle(
+                    pose.getPoseLandmark(PoseLandmark.NOSE),
+                    pose.getPoseLandmark(PoseLandmark.RIGHT_HIP),
+                    pose.getPoseLandmark(PoseLandmark.RIGHT_FOOT_INDEX)
+                )
 
 
 
+                Log.d("DETECT", fullBody.toString())
 
-                Log.d("DETECT", right.toString())
+                onRightArmChange(right)
+                onLeftArmChange(left)
+                onLeftFootChange(leftFoot)
+                onRightFootChange(rightFoot)
 
-                onRightHipAngleChange(right)
             }
-        }else{
-            Log.d("pose","null")
+        } else {
+            Log.d("pose", "null")
         }
 
 
-    }else{
-        Log.d("pose","null")
+    } else {
+        Log.d("pose", "null")
     }
 }
 

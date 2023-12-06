@@ -1,6 +1,6 @@
 package com.tegar.fitmate.ui.screens.routelist
 
-sealed class ScreenRoute (val route : String) {
+sealed class ScreenRoute(val route: String) {
     object Home : ScreenRoute("home")
     object Explore : ScreenRoute("explore")
     object Profile : ScreenRoute("profile")
@@ -8,14 +8,15 @@ sealed class ScreenRoute (val route : String) {
         fun createRoute(workoutId: Long) = "home/$workoutId"
     }
 
-    object InteractiveLearn: ScreenRoute("detailworkout/{workoutId}") {
+    object InteractiveLearn : ScreenRoute("detailworkout/{workoutId}") {
         fun createRoute(workoutId: Long) = "detailworkout/$workoutId"
     }
+
     object Schendule : ScreenRoute("schedule")
     object OnBoarding : ScreenRoute("onboarding")
 
     val requiresBottomBar: Boolean
-        get() = this in listOf(Home, Profile, Explore,Schendule)
+        get() = this in listOf(Home, Profile, Explore, Schendule)
 
 
 }

@@ -26,7 +26,6 @@ class DetailWorkoutViewModel(
             }.collect{ exercise ->
                 _exercise.value = UiState.Success(exercise)
             }
-
         }
     }
 

@@ -28,8 +28,10 @@ class ExerciseRepository {
                         exercise.explain,
                         exercise.step,
                         exercise.category,
+                        exercise.isSupportInteractive,
+                        exercise.interctiveBodyPartSegmentValue,
+                        exercise.bodyPartNeeded,
                         exercise.muscle,
-
                         exercise.photo
                     )
                 )

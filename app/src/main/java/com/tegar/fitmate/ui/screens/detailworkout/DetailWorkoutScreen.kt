@@ -85,7 +85,7 @@ import com.tegar.fitmate.ui.util.formatSteps
 fun DetailWorkoutScreen(
     workoutId: Long,
     navigateBack: () -> Unit,
-    navigateToInteractiveArea:  (Long) -> Unit,
+    navigateToInteractiveArea: (Long) -> Unit,
 
     viewModel: DetailWorkoutViewModel = viewModel(
         factory = ViewModelFactory(
@@ -126,7 +126,7 @@ fun DetailWorkoutScreen(
 fun DetailContent(
     navigateBack: () -> Unit,
     exercise: Exercise,
-    navigateToInteractiveArea : (Long) -> Unit,
+    navigateToInteractiveArea: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -136,7 +136,6 @@ fun DetailContent(
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
-
 
 
         Column(
@@ -182,11 +181,11 @@ fun DetailContent(
 
         }
 
-        if(isSheetOpen){
+        if (isSheetOpen) {
             ModalBottomSheet(
                 containerColor = neutral80,
                 contentColor = neutral10,
-                sheetState =sheetState ,
+                sheetState = sheetState,
                 onDismissRequest = {
                     isSheetOpen = false
                 }) {
@@ -216,32 +215,37 @@ fun DetailContent(
 
                 .align(Alignment.BottomStart)
         ) {
-            FilledTonalButton(
-                onClick = {
-                    navigateToInteractiveArea(exercise.id)
-                },
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp
-                ),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(
-                    vertical = 14.dp,
-                    horizontal = 49.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = neutral80,
-                    contentColor = neutral10
-                )
-            ) {
-                Text(
-                    stringResource(id = R.string.start_interactive_text),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontFamily = FontFamily.Default,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+
+            if (exercise.isSupportInteractive) {
+                FilledTonalButton(
+                    onClick = {
+                        navigateToInteractiveArea(exercise.id)
+                    },
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(
+                        vertical = 14.dp,
+                        horizontal = 49.dp
+                    ),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = neutral80,
+                        contentColor = neutral10
                     )
-                )
+                ) {
+                    Text(
+                        stringResource(id = R.string.start_interactive_text),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontFamily = FontFamily.Default,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
             }
+
+
         }
     }
 

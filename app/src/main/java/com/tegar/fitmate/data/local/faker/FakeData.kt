@@ -1,6 +1,7 @@
 package com.tegar.fitmate.data.local.faker
 
 import com.tegar.fitmate.R
+import com.tegar.fitmate.data.model.BodyPartSegmentValue
 import com.tegar.fitmate.data.model.Category
 import com.tegar.fitmate.data.model.Muscle
 import com.tegar.fitmate.data.model.Exercise
@@ -36,6 +37,14 @@ object FakeData {
                 "Pull the bar down to your chest, keeping your back straight.",
                 "Slowly return the bar to the starting position and repeat."
             ),
+            isSupportInteractive = true,
+            interctiveBodyPartSegmentValue = BodyPartSegmentValue(
+                rightArm = 10.0,
+                leftArm = 10.0,
+                rightLeg = 0.0,
+                leftLeg= 0.0,
+            ),
+            bodyPartNeeded = arrayOf("right_hand" , "left_hand" ),
             category = fakeCategory[0],
             muscle = fakeMuscleData[4],
             photo = R.drawable.lat_pulldown
