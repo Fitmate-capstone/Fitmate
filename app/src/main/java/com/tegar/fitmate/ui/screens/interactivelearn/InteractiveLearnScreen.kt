@@ -147,6 +147,7 @@ fun InteractiveLearnScreen(
     val soundplayState by viewModel.canPlaySound.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val onCounting by viewModel.onCounting.collectAsState()
+    val maxRepetition by viewModel.maxRepetition.collectAsState()
 
     when (exerciseState) {
         is UiState.Loading -> {
@@ -168,16 +169,13 @@ fun InteractiveLearnScreen(
                                 exercise = data,
                                 canPlaySound = soundplayState,
 
-                                playSound = {
-                                    viewModel.playSound()
-                                },
                                 resetTimerSound = {
                                     viewModel.resetTimer()
                                 },
                                 updateCounter = {
                                     viewModel.increaseCount()
                                 },
-                                isSafeZone = uiState.isTutorialScreen,
+                                isSafeZone = (uiState.isTutorialScreen || uiState.isInRestMode),
                                 cameraLens = lens
                             )
 
@@ -189,8 +187,6 @@ fun InteractiveLearnScreen(
                                 .padding(
                                     start = 50.dp
                                 ),
-
-
                             ) {
 
 
@@ -206,7 +202,10 @@ fun InteractiveLearnScreen(
                                             .fillMaxWidth()
                                             .height(200.dp)
                                     )
-                                    Text("For optimal calculations, ensure your smartphone aligns with the illustration above.\n" , style = MaterialTheme.typography.bodyMedium )
+                                    Text(
+                                        "For optimal calculations, ensure your smartphone aligns with the illustration above.\n",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
                                     FilledTonalButton(
                                         onClick = {
                                             viewModel.startTimer()
@@ -223,7 +222,7 @@ fun InteractiveLearnScreen(
                                             containerColor = neutral80,
                                             contentColor = neutral10
                                         ),
-                                        modifier=  Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Text(
                                             "Next",
@@ -235,18 +234,39 @@ fun InteractiveLearnScreen(
                                         )
                                     }
                                 }
+                            } else if (onCounting) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
 
-                            }else if(onCounting){
-                                Column {
+                                ){
 
-//
-                                    Text(viewModel.currentTimeString)
+                                    Text(
+                                        "Be prepare in ",
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontSize = 24.sp,
+                                        )
+                                    )
+                                    Text(viewModel.currentTimeString,
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontSize = 28.sp,
+
+                                            ))
                                 }
-                            }else{
+                            } else if(uiState.isFinished ){
+                                Text("Good You doing this exercise perfect")
+
+                            }
+
+                            else {
                                 Column {
 
 //                                    GifImage()
-                                    Text(uiState.counter.toString())
+                                    Text("${uiState.counter}/${maxRepetition}")
+                                    Text("${uiState.currentRest}")
+
+
                                 }
                             }
 
@@ -297,10 +317,9 @@ fun InteractiveLearnScreen(
 fun CameraPreview(
     exercise: Exercise,
     canPlaySound: Boolean,
-    playSound: () -> Unit,
     resetTimerSound: () -> Unit,
-    isSafeZone : Boolean,
-    updateCounter : () -> Unit,
+    isSafeZone: Boolean,
+    updateCounter: () -> Unit,
     modifier: Modifier = Modifier,
     cameraLens: Int
 ) {
@@ -332,8 +351,16 @@ fun CameraPreview(
         setVolume(1.0f, 1.0f)
     }
 
-    if(!isSafeZone){
-        LaunchedEffect(key1 = areBodyPartsActive(exercise,rightArmAngle,leftArmAngle,rightFootAngle,leftFootAngle) && !isSafeZone ){
+    if (!isSafeZone) {
+        LaunchedEffect(
+            key1 = areBodyPartsActive(
+                exercise,
+                rightArmAngle,
+                leftArmAngle,
+                rightFootAngle,
+                leftFootAngle
+            ) && !isSafeZone
+        ) {
 
             delay(800)
             soundEffect.start()
@@ -376,58 +403,76 @@ fun CameraPreview(
                     onLeftArmChange = { angle ->
                         leftArmAngle = angle
                     },
-                    onLeftFootChange = {angle ->
-                        leftFootAngle  = angle
+                    onLeftFootChange = { angle ->
+                        leftFootAngle = angle
 
                     },
-                    onRightFootChange ={angle ->
+                    onRightFootChange = { angle ->
                         rightFootAngle = angle
 
                     }
 
                 )
 
-                if(isSafeZone){
+                if (isSafeZone) {
                     ColoredBorderBox(
                         modifier = Modifier.fillMaxSize(),
                         borderColor = lightblue60
                     )
-                }else{
+                } else {
                     ColoredBorderBox(
                         modifier = Modifier.fillMaxSize(),
-                        borderColor = if (areBodyPartsActive(exercise,rightArmAngle,leftArmAngle,rightFootAngle,leftFootAngle)) Color.Green else Color.Red
+                        borderColor = if (areBodyPartsActive(
+                                exercise,
+                                rightArmAngle,
+                                leftArmAngle,
+                                rightFootAngle,
+                                leftFootAngle
+                            )
+                        ) Color.Green else Color.Red
                     )
                 }
-
 
 
             }
         }
     }
 }
-fun areBodyPartsActive(exercise: Exercise , rightArmAngle: Double,leftArmAngle: Double,rightFootAngle : Double,leftFootAngle: Double): Boolean {
+
+fun areBodyPartsActive(
+    exercise: Exercise,
+    rightArmAngle: Double,
+    leftArmAngle: Double,
+    rightFootAngle: Double,
+    leftFootAngle: Double
+): Boolean {
     return exercise.bodyPartNeeded.all { bodyPart ->
         when (bodyPart) {
             "right_hand" -> isBodyPartActive(
                 exercise.interctiveBodyPartSegmentValue.rightArm,
                 rightArmAngle
             )
+
             "left_hand" -> isBodyPartActive(
                 exercise.interctiveBodyPartSegmentValue.leftArm,
                 leftArmAngle
             )
+
             "right_leg" -> isBodyPartActive(
                 exercise.interctiveBodyPartSegmentValue.rightLeg,
                 rightFootAngle
             )
+
             "left_leg" -> isBodyPartActive(
                 exercise.interctiveBodyPartSegmentValue.leftLeg,
                 leftFootAngle
             )
+
             else -> false
         }
     }
 }
+
 fun isBodyPartActive(requiredValue: Double, detectedValue: Double): Boolean {
     val angleTolerance = 10.0
 
@@ -450,6 +495,7 @@ private fun ColoredBorderBox(
             .border(1.dp, borderColor) // Border color and width
     )
 }
+
 @Composable
 fun GifImage(
     modifier: Modifier = Modifier,
@@ -478,13 +524,14 @@ fun GifImage(
     )
 
 }
+
 @Composable
 fun DetectedPose(
     pose: Pose?,
     sourceInfo: SourceInfo,
     onRightArmChange: (Double) -> Unit,
     onLeftArmChange: (Double) -> Unit,
-    onLeftFootChange : (Double) -> Unit,
+    onLeftFootChange: (Double) -> Unit,
     onRightFootChange: (Double) -> Unit
 ) {
     var isThumbsUp by remember { mutableStateOf(false) }
@@ -569,7 +616,6 @@ fun DetectedPose(
                 drawLine(rightIndex, rightPinky, primaryPaint)
                 drawLine(rightAnkle, rightHeel, primaryPaint)
                 drawLine(rightHeel, rightFootIndex, primaryPaint)
-
 
 
                 val right = getAngle(

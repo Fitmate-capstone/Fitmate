@@ -14,6 +14,11 @@ data class Exercise(
     val step : Array<String>,
     val category : Category,
     val isSupportInteractive : Boolean = false,
+    val interactiveSetting : InteractiveExerciseSetting = InteractiveExerciseSetting(
+        repetion =  0,
+        set = 0,
+        RestInterval = 0
+    ),
     val interctiveBodyPartSegmentValue: BodyPartSegmentValue = BodyPartSegmentValue(0.0,0.0,0.0,0.0),
     val bodyPartNeeded : Array<String> = arrayOf(""),
     val muscle : Muscle,
@@ -25,4 +30,11 @@ data class BodyPartSegmentValue(
     val leftArm : Double,
     val rightLeg : Double,
     val leftLeg : Double,
+)
+
+
+data class InteractiveExerciseSetting(
+    val repetion : Int,
+    val set : Int,
+    val RestInterval : Long,
 )

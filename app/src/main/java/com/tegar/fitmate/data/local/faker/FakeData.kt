@@ -5,6 +5,7 @@ import com.tegar.fitmate.data.model.BodyPartSegmentValue
 import com.tegar.fitmate.data.model.Category
 import com.tegar.fitmate.data.model.Muscle
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.model.InteractiveExerciseSetting
 
 object FakeData {
 
@@ -25,7 +26,7 @@ object FakeData {
     val fakeExerciseData = listOf(
         Exercise(
             id = 1,
-            name = "Lat Pulldown",
+            name = "Dumbbell Curl",
             rating = 4,
             level = 1,
             calEstimation = 150,
@@ -38,6 +39,12 @@ object FakeData {
                 "Slowly return the bar to the starting position and repeat."
             ),
             isSupportInteractive = true,
+            interactiveSetting = InteractiveExerciseSetting(
+                repetion = 3,
+                set = 2,
+                RestInterval = 60
+
+            ),
             interctiveBodyPartSegmentValue = BodyPartSegmentValue(
                 rightArm = 10.0,
                 leftArm = 10.0,

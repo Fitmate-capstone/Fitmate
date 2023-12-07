@@ -2,6 +2,7 @@ package com.tegar.fitmate.ui.screens.interactivelearn
 
 import android.os.CountDownTimer
 import android.text.format.DateUtils
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,14 +41,21 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
     val canPlaySound: StateFlow<Boolean>
         get() = _canPlaySound
 
-     var currentTimeString by mutableStateOf("")
-
-
+    var currentTimeString by mutableStateOf("")
 
 
     private val _onCounting: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val onCounting: StateFlow<Boolean>
         get() = _onCounting
+
+
+    private val _maxRepetition: MutableStateFlow<Int> = MutableStateFlow(0)
+    val maxRepetition: StateFlow<Int>
+        get() = _maxRepetition
+
+    private val _maxSet: MutableStateFlow<Int> = MutableStateFlow(0)
+    val maxSet: StateFlow<Int>
+        get() = _maxSet
 
     private val _eventCountDownFinish = MutableLiveData<Boolean>()
     val eventCountDownFinish: LiveData<Boolean> = _eventCountDownFinish
@@ -59,33 +67,42 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
                 _exercise.value = UiState.Error(exception.message.orEmpty())
             }.collect { exercise ->
                 _exercise.value = UiState.Success(exercise)
+                _maxRepetition.value = exercise.interactiveSetting.repetion
+                _maxSet.value = exercise.interactiveSetting.set
             }
 
         }
     }
 
 
-
     private fun updateTimeString(millisUntilFinished: Long) {
-        currentTimeString =    DateUtils.formatElapsedTime(millisUntilFinished / 1000)
+        currentTimeString = DateUtils.formatElapsedTime(millisUntilFinished / 1000)
     }
-    fun startTimer() {
+
+    fun startTimer(time: Long = 10) {
         timer?.start()
 
-        val initialTimeMillis = 10  * 1000
-        initialTime.value = initialTimeMillis.toLong()
-        currentTime.value = initialTimeMillis.toLong()
+        val initialTimeMillis = time * 1000
+        initialTime.value = initialTimeMillis
+        currentTime.value = initialTimeMillis
 
-        timer = object : CountDownTimer(initialTimeMillis.toLong(), 1000) {
+        timer = object : CountDownTimer(initialTimeMillis, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {
                 currentTime.value = millisUntilFinished
                 updateTimeString(millisUntilFinished)
                 _onCounting.value = true
             }
+
             override fun onFinish() {
                 resetTimer()
-                playExercise()
+
+                if (_uiState.value.currentRest == _maxSet.value) {
+                    stopExercise()
+                } else {
+                    playExercise()
+
+                }
             }
         }
     }
@@ -99,39 +116,64 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
 
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        timer?.cancel()
-    }
-
-
-    fun playSound() {
-        startTimer()
-    }
-
 
     fun playExercise() {
         _uiState.update { currentState ->
             currentState.copy(
-                isTutorialScreen = false
+                isTutorialScreen = false,
+                isInRestMode = false,
+            )
+
+        }
+    }
+
+    fun stopExercise() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                counter = 0,
+                isFinished = true,
+                isTutorialScreen = false,
+                isInRestMode = true,
             )
 
         }
     }
 
     fun increaseCount() {
-        _uiState.update { currentState ->
-            if(!currentState.isTutorialScreen) {
+
+        if (_uiState.value.counter == maxRepetition.value) {
+            _uiState.update { currentState ->
                 currentState.copy(
-                    counter = currentState.counter + 1
-                )
-            }else{
-                currentState.copy(
-                    counter = 0
+                    counter = 0,
+                    currentRest = currentState.currentRest + 1,
+                    isInRestMode = true
                 )
             }
+            if (_uiState.value.counter == 0 && _uiState.value.isInRestMode  && !_uiState.value.isFinished ) {
+                startTimer(50)
+            }
+        } else {
+            _uiState.update { currentState ->
+                if (!currentState.isTutorialScreen) {
+                    currentState.copy(
+                        counter = currentState.counter + 1
+                    )
+                } else {
+                    currentState.copy(
+                        counter = 0
+                    )
+                }
 
 
+            }
         }
+
+
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        timer?.cancel()
+    }
+
 }

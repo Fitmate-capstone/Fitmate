@@ -29,6 +29,7 @@ class ExerciseRepository {
                         exercise.step,
                         exercise.category,
                         exercise.isSupportInteractive,
+                        exercise.interactiveSetting,
                         exercise.interctiveBodyPartSegmentValue,
                         exercise.bodyPartNeeded,
                         exercise.muscle,
