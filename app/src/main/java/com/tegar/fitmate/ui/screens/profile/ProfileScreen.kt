@@ -80,7 +80,7 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text("Login to fitmate Now" , style = MaterialTheme.typography.bodyLarge.copy(
+                Text("Login to fitmate " , style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 20.sp
                 ))
                 Spacer(modifier = Modifier.height(16.dp))
