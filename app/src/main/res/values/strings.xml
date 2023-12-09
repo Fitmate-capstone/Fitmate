@@ -17,6 +17,9 @@
     <string name="search_label">Search by gesture or tool</string>
     <string name="start_interactive_text">Start Interactive Mode</string>
 
+    <string name="continue_with_google">Continue With Google</string>
+    <string name="logout">Logout</string>
+
     <string name="web_client_id">844776645166-epr9naab15th7drk3cp3dai8fs84pubh.apps.googleusercontent.com</string>
 
 </resources>

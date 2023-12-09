@@ -170,10 +170,6 @@ fun InteractiveLearnScreen(
     val maxSet by viewModel.maxSet.collectAsState()
 
 
-
-
-
-
     when (exerciseState) {
         is UiState.Loading -> {
             viewModel.getWorkoutById(workoutId)
@@ -546,9 +542,9 @@ fun InteractiveLearnScreen(
             Text(stringResource(id = R.string.error_message))
         }
     }
-
-
 }
+
+
 
 
 /*
