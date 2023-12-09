@@ -35,6 +35,15 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.impl.ImageAnalysisConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,6 +55,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,15 +63,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.StayCurrentLandscape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,6 +93,8 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -96,6 +112,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
+import coil.compose.ImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -124,6 +141,7 @@ import com.tegar.fitmate.ui.tracker.VisualizationUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.abs
 import kotlin.math.atan2
 
@@ -140,6 +158,7 @@ fun InteractiveLearnScreen(
     ),
 
     ) {
+
     var lens by remember { mutableStateOf(CameraSelector.LENS_FACING_FRONT) }
     val configuration = LocalConfiguration.current
     val context = LocalContext.current
@@ -148,6 +167,12 @@ fun InteractiveLearnScreen(
     val uiState by viewModel.uiState.collectAsState()
     val onCounting by viewModel.onCounting.collectAsState()
     val maxRepetition by viewModel.maxRepetition.collectAsState()
+    val maxSet by viewModel.maxSet.collectAsState()
+
+
+
+
+
 
     when (exerciseState) {
         is UiState.Loading -> {
@@ -173,9 +198,11 @@ fun InteractiveLearnScreen(
                                     viewModel.resetTimer()
                                 },
                                 updateCounter = {
-                                    viewModel.increaseCount()
+                                    if (uiState.currentSet != maxSet) {
+                                        viewModel.increaseCount()
+                                    }
                                 },
-                                isSafeZone = (uiState.isTutorialScreen || uiState.isInRestMode),
+                                isSafeZone = (uiState.isTutorialScreen || uiState.isInRestMode || uiState.isFinished),
                                 cameraLens = lens
                             )
 
@@ -185,30 +212,256 @@ fun InteractiveLearnScreen(
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(
-                                    start = 50.dp
+                                    start = 55.dp
                                 ),
-                            ) {
+                        ) {
 
 
                             if (uiState.isTutorialScreen && !onCounting) {
                                 Column(
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+
+                                    if (uiState.tutorialStep == 1) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tutorial_1),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp)
+                                        )
+                                        Text(
+                                            "For optimal calculations, ensure your smartphone aligns with the illustration above.\n",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        FilledTonalButton(
+                                            onClick = {
+                                                viewModel.nextStepTutotrial()
+                                            },
+                                            elevation = ButtonDefaults.buttonElevation(
+                                                defaultElevation = 2.dp
+                                            ),
+                                            shape = RoundedCornerShape(12.dp),
+                                            contentPadding = PaddingValues(
+                                                vertical = 14.dp,
+                                                horizontal = 49.dp
+                                            ),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = neutral80,
+                                                contentColor = neutral10
+                                            ),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                "Next",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    fontFamily = FontFamily.Default,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        }
+                                    } else if (uiState.tutorialStep == 2) {
+
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tutorial_step2_illus),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(120.dp)
+                                        )
+                                        Column(
+                                            verticalArrangement = Arrangement.spacedBy(5.dp)
+                                        ) {
+                                            Text(
+                                                "Light blue box: Exercise not started or in rest section ",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                "Red box: Exercise in progress, but movement is incorrect.",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                "Green box: Correct or near-correct movement and will  automatic counter increment",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
+                                        FilledTonalButton(
+                                            onClick = {
+                                                viewModel.nextStepTutotrial()
+                                            },
+                                            elevation = ButtonDefaults.buttonElevation(
+                                                defaultElevation = 2.dp
+                                            ),
+                                            shape = RoundedCornerShape(12.dp),
+                                            contentPadding = PaddingValues(
+                                                vertical = 14.dp,
+                                                horizontal = 49.dp
+                                            ),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = neutral80,
+                                                contentColor = neutral10
+                                            ),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                "Next",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    fontFamily = FontFamily.Default,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        }
+                                    } else {
+
+                                        Column(
+                                            modifier = Modifier.padding(top = 52.dp)
+                                        ) {
+                                            Text(
+                                                "What does the box that appears in the center of the screen mean ?  ",
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+
+                                            ) {
+
+                                                Surface(
+                                                    border = BorderStroke(2.dp, neutral80),
+                                                    modifier = Modifier
+                                                        .background(neutral80)
+                                                        .padding(6.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.Repeat,
+                                                        contentDescription = "Repetisi"
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    "Exercise reps are the counts of movements you perform from the start until the movement is completed once.",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                Surface(
+                                                    border = BorderStroke(2.dp, neutral80),
+                                                    modifier = Modifier
+                                                        .background(neutral80)
+                                                        .padding(6.dp)
+                                                ) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.stack),
+                                                        contentDescription = null,
+                                                        tint = neutral10,
+                                                        modifier = Modifier
+                                                            .width(20.dp)
+                                                            .height(20.dp)
+                                                    )
+                                                }
+
+                                                Spacer(modifier = Modifier.width(4.dp))
+
+                                                Text(
+                                                    "Sets is  number of repetitions of a particular movement performed in a series.",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+
+                                            Spacer(modifier = Modifier.height(12.dp))
+
+                                            FilledTonalButton(
+                                                onClick = {
+                                                    viewModel.startTimer()
+                                                },
+                                                elevation = ButtonDefaults.buttonElevation(
+                                                    defaultElevation = 2.dp
+                                                ),
+                                                shape = RoundedCornerShape(12.dp),
+                                                contentPadding = PaddingValues(
+                                                    vertical = 14.dp,
+                                                    horizontal = 49.dp
+                                                ),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = neutral80,
+                                                    contentColor = neutral10
+                                                ),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+
+
+                                                Text(
+                                                    "Double Tap to start  ",
+                                                    style = MaterialTheme.typography.labelSmall.copy(
+                                                        fontFamily = FontFamily.Default,
+                                                        fontSize = 16.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                )
+                                            }
+                                        }
+
+                                    }
+
+
+                                }
+                            } else if (onCounting) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
 
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.tutorial_1),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp)
-                                    )
+                                    if (uiState.isInRestMode) {
+                                        Text(
+                                            "Take a break Until ",
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontSize = 24.sp,
+                                            )
+                                        )
+                                    } else {
+                                        Text(
+                                            "Be prepare in ",
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontSize = 24.sp,
+                                            )
+                                        )
+                                    }
+
                                     Text(
-                                        "For optimal calculations, ensure your smartphone aligns with the illustration above.\n",
-                                        style = MaterialTheme.typography.bodyMedium
+                                        viewModel.currentTimeString,
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontSize = 28.sp,
+
+                                            )
                                     )
+                                }
+                            } else if (uiState.isFinished && !onCounting) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text(
+                                        "Applause for you!  It's the first step towards a better version of you.",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            textAlign = TextAlign.Center
+
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
                                     FilledTonalButton(
                                         onClick = {
-                                            viewModel.startTimer()
+
                                         },
                                         elevation = ButtonDefaults.buttonElevation(
                                             defaultElevation = 2.dp
@@ -224,47 +477,28 @@ fun InteractiveLearnScreen(
                                         ),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
+
+
                                         Text(
-                                            "Next",
+                                            "View Exercise Summary  ",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontFamily = FontFamily.Default,
                                                 fontSize = 16.sp,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = TextAlign.Center
                                             )
                                         )
                                     }
-                                }
-                            } else if (onCounting) {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.fillMaxSize()
 
-                                ){
 
-                                    Text(
-                                        "Be prepare in ",
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontSize = 24.sp,
-                                        )
-                                    )
-                                    Text(viewModel.currentTimeString,
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontSize = 28.sp,
 
-                                            ))
-                                }
-                            } else if(uiState.isFinished ){
-                                Text("Good You doing this exercise perfect")
 
-                            }
+                        }
 
-                            else {
+                            } else {
                                 Column {
 
-//                                    GifImage()
-                                    Text("${uiState.counter}/${maxRepetition}")
-                                    Text("${uiState.currentRest}")
+                                    GifImage()
 
 
                                 }
@@ -273,7 +507,13 @@ fun InteractiveLearnScreen(
 
                         }
                     }
-                    ScoreBox()
+                    ScoreBox(
+                        currentRepeation = uiState.counter,
+                        maxRepeatition = maxRepetition,
+                        maxSet = maxSet,
+                        currentSet = uiState.currentSet
+
+                    )
 
                 }
 
@@ -309,6 +549,7 @@ fun InteractiveLearnScreen(
 
 
 }
+
 
 /*
     isSafeZone: While still in tutorial mode or rest mode
@@ -520,7 +761,7 @@ fun GifImage(
         contentDescription = null,
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .height(300.dp),
     )
 
 }
@@ -697,6 +938,10 @@ fun getAngle(
 
 @Composable
 fun ScoreBox(
+    currentRepeation: Int,
+    maxRepeatition: Int,
+    currentSet: Int,
+    maxSet: Int
 
 ) {
     Box(
@@ -706,9 +951,37 @@ fun ScoreBox(
 
 
         ) {
-        Box(modifier = Modifier.background(Color.White)) {
-            Text("100", color = Color.Black)
+        Row(
+            modifier = Modifier
+                .background(neutral80)
+                .wrapContentSize()
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 12.dp,
+                    bottom = 12.dp
+                )
 
+        ) {
+            Row() {
+                Icon(Icons.Filled.Repeat, contentDescription = "Repetisi")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("$currentRepeation/$maxRepeatition")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Row() {
+                Icon(
+                    painter = painterResource(id = R.drawable.stack),
+                    contentDescription = null,
+                    tint = neutral10,
+                    modifier = Modifier
+                        .width(20.dp)
+                        .height(20.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("$currentSet/$maxSet")
+            }
 
         }
     }
@@ -839,7 +1112,6 @@ private fun CameraPreview(previewView: PreviewView) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-        // Background color for the entire preview area
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
@@ -850,7 +1122,6 @@ private fun CameraPreview(previewView: PreviewView) {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
-                    // Preview is incorrectly scaled in Compose on some devices without this
                     implementationMode = PreviewView.ImplementationMode.COMPATIBLE
                 }
 
@@ -858,7 +1129,6 @@ private fun CameraPreview(previewView: PreviewView) {
             }
         )
 
-        // Add a green bounding box around the device boundaries
 
     }
 }

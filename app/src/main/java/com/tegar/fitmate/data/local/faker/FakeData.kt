@@ -40,8 +40,8 @@ object FakeData {
             ),
             isSupportInteractive = true,
             interactiveSetting = InteractiveExerciseSetting(
-                repetion = 3,
-                set = 2,
+                repetion = 12,
+                set = 3,
                 RestInterval = 60
 
             ),

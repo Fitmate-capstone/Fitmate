@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class InteractiveLearnViewModel(private val repository: ExerciseRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InteractiveUiState())
@@ -97,12 +98,10 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
             override fun onFinish() {
                 resetTimer()
 
-                if (_uiState.value.currentRest == _maxSet.value) {
-                    stopExercise()
-                } else {
-                    playExercise()
 
-                }
+                playExercise()
+
+
             }
         }
     }
@@ -116,7 +115,24 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
 
     }
 
+    fun nextStepTutotrial(){
+        if(_uiState.value.tutorialStep != 3){
+            _uiState.update { currentState ->
+                currentState.copy(
+                    tutorialStep = currentState.tutorialStep +1
+                )
 
+            }
+        }else{
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isTutorialScreen = false,
+                    isInRestMode = false,
+                )
+
+            }
+        }
+    }
     fun playExercise() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -132,6 +148,7 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
             currentState.copy(
                 counter = 0,
                 isFinished = true,
+                currentSet = currentState.currentSet +1,
                 isTutorialScreen = false,
                 isInRestMode = true,
             )
@@ -141,15 +158,19 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
 
     fun increaseCount() {
 
-        if (_uiState.value.counter == maxRepetition.value) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    counter = 0,
-                    currentRest = currentState.currentRest + 1,
-                    isInRestMode = true
-                )
+        if (_uiState.value.counter == maxRepetition.value - 1) {
+            if (uiState.value.currentSet != maxSet.value - 1) {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        counter = 0,
+                        currentSet = currentState.currentSet + 1,
+                        isInRestMode = true
+                    )
+                }
+            } else {
+                stopExercise()
             }
-            if (_uiState.value.counter == 0 && _uiState.value.isInRestMode  && !_uiState.value.isFinished ) {
+            if (_uiState.value.counter == 0 && _uiState.value.isInRestMode && !_uiState.value.isFinished) {
                 startTimer(50)
             }
         } else {
@@ -175,5 +196,4 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
         super.onCleared()
         timer?.cancel()
     }
-
 }
