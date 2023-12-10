@@ -34,6 +34,7 @@ import com.tegar.fitmate.ui.screens.routelist.ScreenRoute
 import com.tegar.fitmate.ui.screens.schendule.SchenduleScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.tegar.fitmate.ui.screens.equimentsearch.EquimentSearchScreen
 import com.tegar.fitmate.ui.screens.interactivelearn.InteractiveLearnScreen
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
 import kotlinx.coroutines.launch
@@ -60,7 +61,10 @@ fun FitmateApp(
         topBar = {
 
             if (currentRoute == ScreenRoute.Home.route) {
-                AppBar()
+                AppBar(navigatToEquimentSearch = {
+                    navController.navigate(ScreenRoute.EquimentSearch.route)
+
+                })
             }
         },
         bottomBar = {
@@ -81,7 +85,9 @@ fun FitmateApp(
                     navigateToDetail = { workoutId ->
                         navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
                     },
-                )
+
+
+                    )
             }
             composable(
                 ScreenRoute.DetailWorkout.route,
@@ -123,6 +129,9 @@ fun FitmateApp(
             composable(ScreenRoute.Schendule.route) {
 
                 SchenduleScreen()
+            }
+            composable(ScreenRoute.EquimentSearch.route) {
+                EquimentSearchScreen()
             }
             composable(ScreenRoute.Profile.route) {
                 val viewModel = viewModel<ProfileViewModel>()

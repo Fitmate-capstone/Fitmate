@@ -55,7 +55,6 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-
             item {
                 viewModel.exrcisesState.collectAsState(initial = UiState.Loading).value.let { uiState ->
                     when (uiState) {
@@ -80,7 +79,10 @@ fun HomeScreen(
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                     ) {
                                         items(uiState.data, key = { it.name }) { exercise ->
-                                            ExerciseHorizontalCard(exercise = exercise ,     navigateToDetail = navigateToDetail)
+                                            ExerciseHorizontalCard(
+                                                exercise = exercise,
+                                                navigateToDetail = navigateToDetail
+                                            )
                                         }
                                     }
                                 }
@@ -161,7 +163,7 @@ fun HomeScreen(
                                     modifier = Modifier.height(400.dp)
                                 ) {
                                     items(uiState.data, key = { it.name }) { exercise ->
-                                        ExerciseGridCard(exercise = exercise , navigateToDetail)
+                                        ExerciseGridCard(exercise = exercise, navigateToDetail)
                                     }
                                 }
                             }

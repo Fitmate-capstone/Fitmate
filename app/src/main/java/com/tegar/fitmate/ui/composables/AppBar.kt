@@ -2,6 +2,7 @@ package com.tegar.fitmate.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,7 +44,10 @@ import com.tegar.fitmate.ui.theme.neutral80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(modifier: Modifier = Modifier) {
+fun AppBar(
+    navigatToEquimentSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     TopAppBar(
         title = {
             Box(
@@ -71,26 +75,29 @@ fun AppBar(modifier: Modifier = Modifier) {
                     fontSize = 14.sp,
                     placeholderText = "Search",
 
-                )
+                    )
             }
         },
         actions = {
             Surface(
                 color = neutral80,
                 shape = RoundedCornerShape(10.dp),
-            ){
-                Box(Modifier.padding(8.dp)){
+                modifier = Modifier.clickable {
+                    navigatToEquimentSearch()
+                }
+            ) {
+                Box(Modifier.padding(8.dp)) {
                     Icon(
                         imageVector = Icons.Filled.Flip,
                         tint = neutral10,
-                        contentDescription = "Scan Workout Equiment"
+                        contentDescription = stringResource(id = R.string.search_equiment)
                     )
                 }
 
             }
 
         },
-        modifier = modifier
+
 
     )
 }

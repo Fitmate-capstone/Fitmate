@@ -19,8 +19,7 @@ fun CameraX(
     modifier: Modifier = Modifier
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
-    val detectedPose by rememberUpdatedState<Person?>(null)
+
 
     AndroidView(
         factory = {
