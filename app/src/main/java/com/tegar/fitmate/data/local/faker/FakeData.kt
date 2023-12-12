@@ -54,7 +54,8 @@ object FakeData {
             bodyPartNeeded = arrayOf("right_hand" , "left_hand" ),
             category = fakeCategory[0],
             muscle = fakeMuscleData[4],
-            photo = R.drawable.lat_pulldown
+            photo = R.drawable.lat_pulldown,
+            Gif = R.drawable.dummy_2_nobg
         ),
         Exercise(
             id = 2,
@@ -73,7 +74,8 @@ object FakeData {
             category = fakeCategory[0],
 
             muscle = fakeMuscleData[0],
-            photo = R.drawable.bench_press
+            photo = R.drawable.bench_press,
+            Gif = R.drawable.dummy_2_nobg
         ),
         Exercise(
             id = 3,
@@ -92,7 +94,8 @@ object FakeData {
             category = fakeCategory[0],
 
             muscle = fakeMuscleData[0],
-            photo = R.drawable.push_up
+            photo = R.drawable.push_up,
+            Gif = R.drawable.dummy_2_nobg
         ),
         Exercise(
             id = 4,
@@ -109,8 +112,9 @@ object FakeData {
                 "Stand back up to the starting position."
             ),
             category = fakeCategory[0],
-            muscle = fakeMuscleData[0],
-            photo = R.drawable.squat
+            muscle = fakeMuscleData[2],
+            photo = R.drawable.squat,
+            Gif = R.drawable.dummy_2_nobg
         ),
     )
 

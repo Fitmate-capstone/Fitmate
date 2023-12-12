@@ -1,17 +1,27 @@
 package com.tegar.fitmate.ui.screens.detailworkout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.model.SchenduleExercise
+import com.tegar.fitmate.data.model.SchenduleExerciseInput
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
+import com.tegar.fitmate.repository.SchenduleExerciseRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailWorkoutViewModel(
-    private val repository: ExerciseRepository
+@HiltViewModel
+class DetailWorkoutViewModel @Inject constructor(
+    private val repository: ExerciseRepository,
+    private val schenduleExerciseRepository: SchenduleExerciseRepository
+
 ) : ViewModel() {
 
     private val _exercise: MutableStateFlow<UiState<Exercise>> =
@@ -26,6 +36,15 @@ class DetailWorkoutViewModel(
             }.collect{ exercise ->
                 _exercise.value = UiState.Success(exercise)
             }
+        }
+    }
+
+
+    fun addWorkoutSchendule(exerciseSchendule : SchenduleExerciseEntity) {
+
+        viewModelScope.launch {
+            schenduleExerciseRepository.insertSchendule(exerciseSchendule)
+
         }
     }
 

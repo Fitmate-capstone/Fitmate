@@ -34,6 +34,7 @@ import com.tegar.fitmate.ui.screens.routelist.ScreenRoute
 import com.tegar.fitmate.ui.screens.schendule.SchenduleScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.tegar.fitmate.ui.screens.detailschendule.DetailSchenduleScreen
 import com.tegar.fitmate.ui.screens.equimentsearch.EquimentSearchScreen
 import com.tegar.fitmate.ui.screens.interactivelearn.InteractiveLearnScreen
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
@@ -124,12 +125,27 @@ fun FitmateApp(
             }
             composable(ScreenRoute.Schendule.route) {
 
-                SchenduleScreen()
+                SchenduleScreen(
+                    navigateToDetail = { workoutdate ->
+                        navController.navigate(ScreenRoute.DetailSchedule.createRoute(workoutdate))
+                    },
+                )
             }
-            composable(ScreenRoute.Schendule.route) {
+            composable(
+                ScreenRoute.DetailSchedule.route,
+                arguments = listOf(
+                    navArgument("workoutdate") { type = NavType.StringType }),
+            ) {
+                val workoutdate = it.arguments?.getString("workoutdate") ?: ""
+                DetailSchenduleScreen(
+                    workoutdate = workoutdate,
+                    navigateToDetailSchedule = { workoutId ->
+                        navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
+                    },
+                    navigateBack = { navController.navigateUp() },
+                )
+            }
 
-                SchenduleScreen()
-            }
             composable(ScreenRoute.EquimentSearch.route) {
                 EquimentSearchScreen()
             }

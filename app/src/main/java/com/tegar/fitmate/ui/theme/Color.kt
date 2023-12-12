@@ -21,7 +21,7 @@ val lightblue80 = Color(0xff449F95)
 val lightblue90 = Color(0xff337870)
 val lightblue100 = Color(0xff22504B)
 val lightblue110 = Color(0xff14302D)
-
+val lightblue120 = Color(0xff0A1816)
 val neutral10 = Color(0XFFFFFFFF)
 val neutral20 = Color(0XFFECECEC)
 val neutral30 = Color(0XFFCCCCCC)

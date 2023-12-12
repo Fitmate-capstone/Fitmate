@@ -21,6 +21,8 @@
     <string name="search_equiment">Search Equiment by image</string>
 
     <string name="logout">Logout</string>
+    <string name="total_exercise_count">%1$d exercise</string>
+    <string name="total_calori_count">%1$d calori</string>
 
     <string name="web_client_id">844776645166-epr9naab15th7drk3cp3dai8fs84pubh.apps.googleusercontent.com</string>
 

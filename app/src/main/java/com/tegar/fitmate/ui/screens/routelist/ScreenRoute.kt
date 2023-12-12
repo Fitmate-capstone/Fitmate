@@ -15,6 +15,9 @@ sealed class ScreenRoute(val route: String) {
     }
 
     object Schendule : ScreenRoute("schedule")
+    object DetailSchedule : ScreenRoute("schedule/{workoutdate}") {
+        fun createRoute(workoutdate: String) = "schedule/$workoutdate"
+    }
     object OnBoarding : ScreenRoute("onboarding")
     object EquimentSearch : ScreenRoute("equiment-search")
 

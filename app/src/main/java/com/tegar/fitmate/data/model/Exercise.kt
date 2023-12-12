@@ -23,6 +23,7 @@ data class Exercise(
     val bodyPartNeeded : Array<String> = arrayOf(""),
     val muscle : Muscle,
     @DrawableRes val photo : Int,
+    @DrawableRes val Gif : Int,
 )
 
 data class BodyPartSegmentValue(

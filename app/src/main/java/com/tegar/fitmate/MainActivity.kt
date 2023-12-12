@@ -28,8 +28,9 @@ import com.tegar.fitmate.ui.FitmateApp
 import com.tegar.fitmate.ui.screens.profile.ProfileViewModel
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
 import com.tegar.fitmate.ui.theme.FitmateTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
         GoogleAuthClient(

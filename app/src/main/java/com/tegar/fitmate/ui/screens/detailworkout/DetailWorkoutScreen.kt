@@ -1,6 +1,8 @@
 package com.tegar.fitmate.ui.screens.detailworkout
 
 import android.os.Build.VERSION.SDK_INT
+import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,7 +30,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flip
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -41,6 +49,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -60,6 +69,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -70,15 +80,25 @@ import coil.decode.VideoFrameDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.tegar.fitmate.R
+import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.model.SchenduleExerciseInput
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.di.Injection
+import com.tegar.fitmate.ui.MultipleViewModelFactory
 import com.tegar.fitmate.ui.screens.ViewModelFactory
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
 import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
+import com.tegar.fitmate.ui.util.formatDate
 import com.tegar.fitmate.ui.util.formatSteps
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,18 +107,15 @@ fun DetailWorkoutScreen(
     navigateBack: () -> Unit,
     navigateToInteractiveArea: (Long) -> Unit,
 
-    viewModel: DetailWorkoutViewModel = viewModel(
-        factory = ViewModelFactory(
-            Injection.provideRepository()
-        )
-    ),
+    detailWorkoutViewModel: DetailWorkoutViewModel = hiltViewModel()
 
-    ) {
+) {
 
-    val exerciseState by viewModel.exercise.collectAsState(initial = UiState.Loading)
+
+    val exerciseState by detailWorkoutViewModel.exercise.collectAsState(initial = UiState.Loading)
     when (exerciseState) {
         is UiState.Loading -> {
-            viewModel.getWorkoutById(workoutId)
+            detailWorkoutViewModel.getWorkoutById(workoutId)
         }
 
         is UiState.Success -> {
@@ -109,7 +126,10 @@ fun DetailWorkoutScreen(
             DetailContent(
                 navigateBack,
                 data,
-                navigateToInteractiveArea
+                navigateToInteractiveArea,
+                addToSchendule = { schendule ->
+                    detailWorkoutViewModel.addWorkoutSchendule(schendule)
+                }
 
             )
         }
@@ -127,12 +147,16 @@ fun DetailContent(
     navigateBack: () -> Unit,
     exercise: Exercise,
     navigateToInteractiveArea: (Long) -> Unit,
+    addToSchendule: (SchenduleExerciseEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState()
     var isSheetOpen by rememberSaveable {
         mutableStateOf(false)
     }
+    val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Picker)
+    val context = LocalContext.current
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -174,7 +198,7 @@ fun DetailContent(
 
                 }
             }
-            WorkoutTutorial()
+            WorkoutTutorial(exercise.Gif)
             Spacer(modifier = Modifier.height(100.dp))
             WorkoutInformationTab(exercise)
 
@@ -189,13 +213,76 @@ fun DetailContent(
                 onDismissRequest = {
                     isSheetOpen = false
                 }) {
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
-                Text("Schendule to learn this")
+                Column(
+                    Modifier.padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = 36.dp,
+                    )
+                ) {
+
+
+                    DatePicker(
+                        state = datePickerState,
+
+                        title = {
+                            Text(
+                                "When you want learn this exercise",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        },
+
+                        showModeToggle = true, colors = DatePickerDefaults.colors(
+                            yearContentColor = neutral10,
+                            containerColor = neutral80,
+
+                            selectedDayContentColor = lightblue60,
+                            todayDateBorderColor = neutral10,
+                            todayContentColor = neutral30
+                        )
+                    )
+
+                    Button(
+                        enabled = datePickerState.selectedDateMillis ?: 0 >= System.currentTimeMillis(),
+                        onClick = {
+
+
+                            val data = SchenduleExerciseEntity(
+                                id_exercise = exercise.id,
+                                name_exercise = exercise.name,
+                                exercise_calori = exercise.calEstimation,
+                                exercise_gif_url = exercise.Gif,
+                                exercise_category = exercise.category.name,
+                                dateMillis = datePickerState.selectedDateMillis ?: 0,
+                                dateString = formatDate(datePickerState.selectedDateMillis ?: 0L),
+                                exercise_muscle_target = exercise.muscle.name,
+                                isFinished = false,
+                            )
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                addToSchendule(data)
+
+                                // Menampilkan Toast setelah addToSchendule berhasil
+                                Toast.makeText(
+                                    context,
+                                    "Exercise scheduled successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                isSheetOpen = false
+                            }
+
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Schendule ")
+                    }
+
+                }
 
             }
         }
@@ -253,6 +340,7 @@ fun DetailContent(
 
 @Composable
 fun GifImage(
+    @DrawableRes gif: Int,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -268,18 +356,23 @@ fun GifImage(
     Image(
 
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.dummy_2).apply(block = {
+            ImageRequest.Builder(context).data(data = gif).apply(block = {
                 size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(300.dp),
     )
 
 }
 
 @Composable
-fun WorkoutTutorial(modifier: Modifier = Modifier) {
+fun WorkoutTutorial(
+    @DrawableRes gif: Int,
+    modifier: Modifier = Modifier
+) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     val tabTitles = listOf("Animation", "Video")
@@ -319,7 +412,7 @@ fun WorkoutTutorial(modifier: Modifier = Modifier) {
         // Content based on selected tab
         Box(modifier.padding(16.dp)) {
             when (selectedTabIndex) {
-                0 -> GifImage()
+                0 -> GifImage(gif)
                 1 -> WorkoutVideo()
             }
         }

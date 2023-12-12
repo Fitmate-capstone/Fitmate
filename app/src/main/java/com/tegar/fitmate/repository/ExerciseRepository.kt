@@ -6,8 +6,9 @@ import com.tegar.fitmate.data.model.Muscle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import javax.inject.Inject
 
-class ExerciseRepository {
+class ExerciseRepository @Inject constructor(){
 
     private val exercises = mutableListOf<Exercise>()
     private val exercisesByMuscle = mutableListOf<Exercise>()
@@ -33,7 +34,8 @@ class ExerciseRepository {
                         exercise.interctiveBodyPartSegmentValue,
                         exercise.bodyPartNeeded,
                         exercise.muscle,
-                        exercise.photo
+                        exercise.photo,
+                        exercise.Gif
                     )
                 )
             }
