@@ -12,6 +12,7 @@ import android.provider.CalendarContract.Colors
 import android.util.Log
 import android.util.Size
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.arch.core.executor.TaskExecutor
 import androidx.camera.core.CameraSelector
@@ -494,7 +495,9 @@ fun InteractiveLearnScreen(
                             } else {
                                 Column {
 
-                                    GifImage()
+                                    GifImage(
+                                        data.Gif
+                                    )
 
 
                                 }
@@ -735,6 +738,7 @@ private fun ColoredBorderBox(
 
 @Composable
 fun GifImage(
+    @DrawableRes gif : Int,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -750,7 +754,7 @@ fun GifImage(
     Image(
 
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.dummy_2_nobg).apply(block = {
+            ImageRequest.Builder(context).data(data = gif).apply(block = {
                 size(coil.size.Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),

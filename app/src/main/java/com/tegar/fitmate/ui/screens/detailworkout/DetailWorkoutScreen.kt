@@ -129,7 +129,9 @@ fun DetailWorkoutScreen(
                 navigateToInteractiveArea,
                 addToSchendule = { schendule ->
                     detailWorkoutViewModel.addWorkoutSchendule(schendule)
-                }
+                },
+
+
 
             )
         }
@@ -147,7 +149,8 @@ fun DetailContent(
     navigateBack: () -> Unit,
     exercise: Exercise,
     navigateToInteractiveArea: (Long) -> Unit,
-    addToSchendule: (SchenduleExerciseEntity) -> Unit,
+    addToSchendule: (SchenduleExerciseEntity) -> String,
+
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -264,15 +267,13 @@ fun DetailContent(
                             )
 
                             CoroutineScope(Dispatchers.Main).launch {
-                                addToSchendule(data)
+                                val message = addToSchendule(data)
 
-                                // Menampilkan Toast setelah addToSchendule berhasil
                                 Toast.makeText(
                                     context,
-                                    "Exercise scheduled successfully",
+                                    message,
                                     Toast.LENGTH_SHORT
                                 ).show()
-
                                 isSheetOpen = false
                             }
 

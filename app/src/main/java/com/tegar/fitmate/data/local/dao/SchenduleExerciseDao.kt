@@ -24,10 +24,17 @@ interface SchenduleExerciseDao {
     fun getSummaryByDate(): List<SchenduleExercise>
 
 
+    @Query("SELECT * FROM schendule_exercise WHERE dateString = :selectedDate AND id_exercise = :exerciseId")
+    fun isExerciseAlreadyExist(selectedDate: String,exerciseId : Long): List<SchenduleExerciseEntity>
+
 
     @Insert
     suspend fun insertExercise(exercise: SchenduleExerciseEntity)
 
+
+
+    @Query("DELETE FROM schendule_exercise WHERE dateString = :dateString")
+    suspend fun deleteExerciseByDate(dateString: String)
     @Delete
     suspend fun deleteExercise(exercise: SchenduleExerciseEntity)
 }

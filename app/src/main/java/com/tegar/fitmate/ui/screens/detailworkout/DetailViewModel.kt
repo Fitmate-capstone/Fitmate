@@ -11,6 +11,7 @@ import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
 import com.tegar.fitmate.repository.SchenduleExerciseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -29,6 +30,8 @@ class DetailWorkoutViewModel @Inject constructor(
     val exercise: StateFlow<UiState<Exercise>>
         get() = _exercise
 
+
+
     fun getWorkoutById(workoutId: Long) {
         viewModelScope.launch {
             repository.getWorkoutById(workoutId).catch { exception ->
@@ -40,12 +43,25 @@ class DetailWorkoutViewModel @Inject constructor(
     }
 
 
-    fun addWorkoutSchendule(exerciseSchendule : SchenduleExerciseEntity) {
 
+
+    fun addWorkoutSchendule(exerciseSchendule : SchenduleExerciseEntity) : String {
+        var  message = ""
         viewModelScope.launch {
-            schenduleExerciseRepository.insertSchendule(exerciseSchendule)
+
+            val isAlreadyExist = schenduleExerciseRepository.isExerciseAlreadyExist(exerciseSchendule.dateString,exerciseSchendule.id_exercise)
+            if (isAlreadyExist.isNotEmpty()) {
+                message = "Exercise is already scheduled for this date."
+            } else {
+                message= "Exercise scheduled successfully."
+                schenduleExerciseRepository.insertSchendule(exerciseSchendule)
+            }
+
 
         }
+
+        return message
+
     }
 
 }

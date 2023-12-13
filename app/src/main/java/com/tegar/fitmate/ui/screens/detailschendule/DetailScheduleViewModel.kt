@@ -39,6 +39,17 @@ class DetailScheduleViewModel @Inject constructor(
             }
         }
     }
+    fun deleteExercise(exerciseSchendule: SchenduleExerciseEntity) {
+        viewModelScope.launch {
+            _exerciseState.value = UiState.Loading
+            schenduleExerciseRepository.deleteExercise(exerciseSchendule)
+        }
+    }
+    fun deleteScheduleByDate(date : String) {
+        viewModelScope.launch {
+            schenduleExerciseRepository.deleteScheduleByDate(date)
+        }
+    }
 
 
 }

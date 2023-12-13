@@ -1,6 +1,7 @@
 package com.tegar.fitmate.ui.screens.detailschendule
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,23 +19,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Light
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,7 +60,9 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.util.UiState
+import com.tegar.fitmate.ui.composables.ExerciseItemSchedule
 import com.tegar.fitmate.ui.screens.schendule.SchenduleViewModel
+import com.tegar.fitmate.ui.theme.alertColor
 import com.tegar.fitmate.ui.theme.lightblue120
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
@@ -60,14 +71,16 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailSchenduleScreen(
     workoutdate: String,
     navigateBack: () -> Unit,
-    navigateToDetailSchedule: (workoutId : Long) -> Unit,
+    navigateToDetailSchedule: (workoutId: Long) -> Unit,
     detailScheduleViewModel: DetailScheduleViewModel = hiltViewModel()
 
 ) {
+    val context = LocalContext.current
     Column {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,7 +102,17 @@ fun DetailSchenduleScreen(
 
                 }
             ) {
-                Box(Modifier.padding(8.dp)) {
+
+                IconButton(onClick = {
+
+                    detailScheduleViewModel.deleteScheduleByDate(workoutdate)
+                    navigateBack()
+                    Toast.makeText(
+                        context,
+                        "Exercise scheduled successfully deleted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         tint = neutral10,
@@ -97,6 +120,7 @@ fun DetailSchenduleScreen(
                         contentDescription = "Delete this activity"
                     )
                 }
+
 
             }
         }
@@ -113,102 +137,64 @@ fun DetailSchenduleScreen(
                         if (uiState.data.isEmpty()) {
                             Text(stringResource(id = R.string.empty_exercise_message))
                         } else {
-                            LazyColumn {
+                            LazyColumn(
+                                state = rememberLazyListState(),
+                            ) {
                                 items(uiState.data, key = { it.id }) { exercise ->
-                                    Card(
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = neutral80
-                                        ),
-                                        modifier = Modifier
-                                            .padding(10.dp)
-                                            .fillMaxSize()
-                                            .clickable {
-                                                navigateToDetailSchedule(exercise.id_exercise)
-                                            },
 
-                                        ) {
-                                        Row(
 
-                                        ) {
+                                    val state = rememberDismissState(
+                                        confirmValueChange = {
+                                            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
+                                                detailScheduleViewModel.deleteExercise(exercise)
+
+                                                if(uiState.data.size == 1 ){
+                                                    navigateBack()
+                                                }
+
+
+                                                true
+                                            }
+                                            true
+                                        }
+                                    )
+
+                                    SwipeToDismiss(
+
+                                        state = state,
+                                        background = {
+                                            val color = when (state.dismissDirection) {
+                                                DismissDirection.EndToStart -> alertColor
+                                                DismissDirection.StartToEnd ->  alertColor
+                                                null -> Color.Transparent
+                                            }
                                             Box(
                                                 modifier = Modifier
-                                                    .background(
-                                                        neutral10,
-                                                    )
-                                                    .width(64.dp)
-                                                    .fillMaxHeight()
+                                                    .background(color)
+                                                    .fillMaxSize()
+                                                    .padding(10.dp)
 
                                             ) {
-                                                    // image
-                                                GifImage(exercise.exercise_gif_url)
-                                            }
-                                            Column(
-                                                verticalArrangement = Arrangement.SpaceBetween,
-
-                                                modifier = Modifier.padding(10.dp)
-                                            ) {
-
-
-                                                Row(
-                                                    horizontalArrangement = Arrangement.SpaceBetween
-                                                ){
-                                                    Text(
-                                                        exercise.name_exercise,
-                                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                                            color = neutral10,
-                                                            fontWeight = FontWeight.Bold,
-                                                            fontSize = 14.sp,
-
-                                                            ),
-                                                        overflow = TextOverflow.Ellipsis
-                                                    )
-
-                                                    if(exercise.isFinished){
-                                                        Text(
-                                                            "Done",
-                                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                                color = neutral10,
-                                                                fontWeight = FontWeight.Bold,
-                                                                fontSize = 14.sp,
-
-                                                                ),
-                                                            overflow = TextOverflow.Ellipsis
-                                                        )
-                                                    }
-                                                }
-                                                Spacer(modifier = Modifier.height(10.dp))
-                                                Row(
-                                                    horizontalArrangement = Arrangement.spacedBy(26.dp)
-                                                ) {
-
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(
-                                                            9.dp
-                                                        )
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Filled.LocalFireDepartment,
-
-                                                            contentDescription = null,
-                                                            tint = lightblue60
-                                                        )
-                                                        Text(
-                                                            text = stringResource(
-                                                                R.string.calori_format,
-                                                                exercise.exercise_calori.toInt()
-                                                            ),
-                                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                                color = neutral10
-                                                            )
-                                                        )
-                                                    }
-                                                }
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete",
+                                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                                )
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete",
+                                                    modifier = Modifier.align(Alignment.CenterStart)
+                                                )
                                             }
 
-                                        }
-
-                                    }
+                                        },
+                                        dismissContent = {
+                                            ExerciseItemSchedule(
+                                                exercise = exercise,
+                                                navigateToDetailSchedule = { id ->
+                                                    navigateToDetailSchedule(id)
+                                                })
+                                        })
 
                                 }
                             }
@@ -228,33 +214,3 @@ fun DetailSchenduleScreen(
 
 }
 
-@Composable
-fun GifImage(
-    @DrawableRes gif: Int,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (Build.VERSION.SDK_INT >= 28) {
-                add(ImageDecoderDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
-    Image(
-
-        painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = gif).apply(block = {
-                size(Size.ORIGINAL)
-            }).build(), imageLoader = imageLoader
-        ),
-        contentDescription = null,
-        modifier = modifier
-            .height(70.dp)
-
-
-    )
-
-}

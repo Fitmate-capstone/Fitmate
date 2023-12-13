@@ -31,5 +31,6 @@ val neutral60 = Color(0XFF555555)
 val neutral70 = Color(0XFF2B2B2B)
 val neutral80 = Color(0XFF1D1D1D)
 val neutral90 = Color(0XFF000000)
+val alertColor = Color(0xFF220F12)
 
 

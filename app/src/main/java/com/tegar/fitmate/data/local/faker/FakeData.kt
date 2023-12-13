@@ -53,9 +53,9 @@ object FakeData {
             ),
             bodyPartNeeded = arrayOf("right_hand" , "left_hand" ),
             category = fakeCategory[0],
-            muscle = fakeMuscleData[4],
-            photo = R.drawable.lat_pulldown,
-            Gif = R.drawable.dummy_2_nobg
+            muscle = fakeMuscleData[3],
+            photo = R.drawable.dumbbel_bicep_cover,
+            Gif = R.drawable.dumbbel_bicep
         ),
         Exercise(
             id = 2,
