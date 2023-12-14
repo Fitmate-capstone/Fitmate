@@ -250,7 +250,10 @@ fun DetailContent(
                     )
 
                     Button(
-                        enabled = datePickerState.selectedDateMillis ?: 0 >= System.currentTimeMillis(),
+                        enabled = System.currentTimeMillis() <= (datePickerState.selectedDateMillis
+                            ?: 0) || formatDate(System.currentTimeMillis()) == formatDate(
+                            datePickerState.selectedDateMillis ?: 0
+                        ),
                         onClick = {
 
 

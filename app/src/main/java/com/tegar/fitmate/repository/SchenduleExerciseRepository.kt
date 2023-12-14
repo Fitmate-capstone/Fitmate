@@ -1,12 +1,16 @@
 package com.tegar.fitmate.repository
 
+import android.content.Context
 import com.tegar.fitmate.data.local.dao.SchenduleExerciseDao
+import com.tegar.fitmate.data.local.database.FitmateDatabase
 import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.SchenduleExercise
 import com.tegar.fitmate.data.model.SchenduleExerciseInput
 import com.tegar.fitmate.repository.type.SchenduleExerciseType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 class SchenduleExerciseRepository @Inject constructor(private val db: SchenduleExerciseDao) :
@@ -30,6 +34,11 @@ class SchenduleExerciseRepository @Inject constructor(private val db: SchenduleE
         return flowOf(db.getExercisesByDate(date))
     }
 
+    fun getTodaySchedule() : List<SchenduleExerciseEntity> {
+        val currentDate = SimpleDateFormat("yyyy-MM-dd").format(Date())
+        return db.getExercisesByDate(currentDate)
+    }
+
 
     override suspend fun deleteScheduleByDate(date: String) {
         db.deleteExerciseByDate(date)
@@ -38,6 +47,23 @@ class SchenduleExerciseRepository @Inject constructor(private val db: SchenduleE
     override suspend fun deleteExercise(exercise: SchenduleExerciseEntity) {
         db.deleteExercise(exercise)
     }
+
+//    companion object {
+//        @Volatile
+//        private var instance: SchenduleExerciseRepository? = null
+//        private const val PAGE_SIZE = 10
+//
+//        fun getInstance(context: Context): SchenduleExerciseRepository? {
+//
+//            return instance ?: synchronized(SchenduleExerciseRepository::class.java) {
+//                if (instance == null) {
+//                    val database = FitmateDatabase.getInstance(context)
+//                    instance = DataRepository(database.courseDao())
+//                }
+//                return instance
+//            }
+//        }
+//    }
 
 
 }

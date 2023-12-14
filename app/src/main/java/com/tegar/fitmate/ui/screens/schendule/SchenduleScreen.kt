@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Light
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.sp
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.tegar.fitmate.R
+import com.tegar.fitmate.data.notification.DailyReminder
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.ui.theme.lightblue120
 import com.tegar.fitmate.ui.theme.lightblue60
@@ -48,9 +51,11 @@ import java.util.Locale
 @Composable
 fun SchenduleScreen(
     navigateToDetail : (String) -> Unit,
+    navigateToScheduleSetting : () -> Unit,
     schenduleViewModel: SchenduleViewModel = hiltViewModel()
 ) {
-
+    val context = LocalContext.current
+    val dailyReminder = DailyReminder()
 
     Box(modifier = Modifier.padding(10.dp)) {
         schenduleViewModel.schenduleState.collectAsState().value.let { uiState ->
@@ -64,6 +69,15 @@ fun SchenduleScreen(
                         Text(stringResource(id = R.string.empty_exercise_message))
                     } else {
                         LazyColumn {
+
+                            item{
+                                Button(onClick = navigateToScheduleSetting) {
+                                    Text("Reminder me")
+                                }
+                                Button(onClick = {   dailyReminder.cancelAlarm(context) }) {
+                                    Text("Cancel reminder")
+                                }
+                            }
                             items(uiState.data, key = { it.id }) { schendule ->
                                 Card(
                                     colors = CardDefaults.cardColors(
@@ -71,7 +85,8 @@ fun SchenduleScreen(
                                     ),
                                     modifier = Modifier
                                         .padding(10.dp)
-                                        .fillMaxSize().clickable {
+                                        .fillMaxSize()
+                                        .clickable {
                                             navigateToDetail(schendule.dateString)
                                         },
 

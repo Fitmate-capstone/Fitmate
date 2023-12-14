@@ -23,6 +23,7 @@
     <string name="logout">Logout</string>
     <string name="total_exercise_count">%1$d exercise</string>
     <string name="total_calori_count">%1$d calori</string>
+    <string name="notification_message_format">(%1$s - %2$s) %3$s</string>
 
     <string name="web_client_id">844776645166-epr9naab15th7drk3cp3dai8fs84pubh.apps.googleusercontent.com</string>
 

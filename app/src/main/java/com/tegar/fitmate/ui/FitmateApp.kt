@@ -37,6 +37,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tegar.fitmate.ui.screens.detailschendule.DetailSchenduleScreen
 import com.tegar.fitmate.ui.screens.equimentsearch.EquimentSearchScreen
 import com.tegar.fitmate.ui.screens.interactivelearn.InteractiveLearnScreen
+import com.tegar.fitmate.ui.screens.remindersetting.ReminderSettingScreen
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
 import kotlinx.coroutines.launch
 
@@ -129,6 +130,10 @@ fun FitmateApp(
                     navigateToDetail = { workoutdate ->
                         navController.navigate(ScreenRoute.DetailSchedule.createRoute(workoutdate))
                     },
+                    navigateToScheduleSetting = {
+                        navController.navigate(ScreenRoute.ReminderSetting.route)
+
+                    }
                 )
             }
             composable(
@@ -148,6 +153,13 @@ fun FitmateApp(
 
             composable(ScreenRoute.EquimentSearch.route) {
                 EquimentSearchScreen()
+            }
+
+            composable(ScreenRoute.ReminderSetting.route) {
+                ReminderSettingScreen(
+                    navigateBack = { navController.navigateUp() },
+
+                    )
             }
             composable(ScreenRoute.Profile.route) {
                 val viewModel = viewModel<ProfileViewModel>()

@@ -20,7 +20,7 @@ sealed class ScreenRoute(val route: String) {
     }
     object OnBoarding : ScreenRoute("onboarding")
     object EquimentSearch : ScreenRoute("equiment-search")
-
+    object ReminderSetting : ScreenRoute("reminder-setting")
     val requiresBottomBar: Boolean
         get() = this in listOf(Home, Profile, Explore, Schendule)
 
