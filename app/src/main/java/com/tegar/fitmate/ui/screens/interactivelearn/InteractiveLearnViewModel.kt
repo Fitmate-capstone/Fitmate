@@ -14,7 +14,10 @@ import androidx.lifecycle.viewModelScope
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
+import com.tegar.fitmate.repository.SchenduleExerciseRepository
 import com.tegar.fitmate.ui.state.InteractiveUiState
+import com.tegar.fitmate.ui.util.formatDate
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +25,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class InteractiveLearnViewModel(private val repository: ExerciseRepository) : ViewModel() {
+@HiltViewModel
+class InteractiveLearnViewModel  @Inject constructor(    private val repository: ExerciseRepository,
+                                    private val schenduleExerciseRepository: SchenduleExerciseRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InteractiveUiState())
     val uiState: StateFlow<InteractiveUiState> = _uiState.asStateFlow()
@@ -67,6 +73,11 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
             repository.getWorkoutById(workoutId).catch { exception ->
                 _exercise.value = UiState.Error(exception.message.orEmpty())
             }.collect { exercise ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                       exerciseId = exercise.id
+                    )
+                }
                 _exercise.value = UiState.Success(exercise)
                 _maxRepetition.value = exercise.interactiveSetting.repetion
                 _maxSet.value = exercise.interactiveSetting.set
@@ -144,6 +155,8 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
     }
 
     fun stopExercise() {
+        val currentTimeMillis = System.currentTimeMillis()
+        val currentDate = formatDate(currentTimeMillis)
         _uiState.update { currentState ->
             currentState.copy(
                 counter = 0,
@@ -154,6 +167,7 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
             )
 
         }
+        updateExerciseSchedule(_uiState.value.exerciseId,currentDate )
     }
 
     fun increaseCount() {
@@ -191,7 +205,11 @@ class InteractiveLearnViewModel(private val repository: ExerciseRepository) : Vi
 
 
     }
-
+    fun updateExerciseSchedule(workoutId: Long, dateString: String) {
+        viewModelScope.launch {
+            schenduleExerciseRepository.updateExerciseSchedule(workoutId, dateString)
+        }
+    }
     override fun onCleared() {
         super.onCleared()
         timer?.cancel()

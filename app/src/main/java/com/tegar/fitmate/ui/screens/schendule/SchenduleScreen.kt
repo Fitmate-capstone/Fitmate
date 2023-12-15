@@ -18,11 +18,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Light
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,12 +73,19 @@ fun SchenduleScreen(
                         LazyColumn {
 
                             item{
-                                Button(onClick = navigateToScheduleSetting) {
-                                    Text("Reminder me")
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ){
+
+                                    Text(" Exercise Schedule")
+                                    IconButton(onClick = navigateToScheduleSetting) {
+                                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "Setting Notification")
+                                    }
                                 }
-                                Button(onClick = {   dailyReminder.cancelAlarm(context) }) {
-                                    Text("Cancel reminder")
-                                }
+
+
                             }
                             items(uiState.data, key = { it.id }) { schendule ->
                                 Card(

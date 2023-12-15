@@ -44,6 +44,10 @@ class SchenduleExerciseRepository @Inject constructor(private val db: SchenduleE
         db.deleteExerciseByDate(date)
     }
 
+    override suspend fun updateExerciseSchedule(workoutId: Long, dateString: String) {
+        db.updateExerciseSchedule(workoutId, dateString)
+    }
+
     override suspend fun deleteExercise(exercise: SchenduleExerciseEntity) {
         db.deleteExercise(exercise)
     }

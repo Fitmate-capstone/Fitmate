@@ -44,7 +44,6 @@ class DetailWorkoutViewModel @Inject constructor(
 
 
 
-
     fun addWorkoutSchendule(exerciseSchendule : SchenduleExerciseEntity) : String {
         var  message = ""
         viewModelScope.launch {

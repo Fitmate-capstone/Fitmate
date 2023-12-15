@@ -23,9 +23,9 @@ class ViewModelFactory(private val repository: ExerciseRepository) :
 //        if (modelClass.isAssignableFrom(DetailWorkoutViewModel::class.java)) {
 //            return DetailWorkoutViewModel(repository ) as T
 //        }
-        if (modelClass.isAssignableFrom(InteractiveLearnViewModel::class.java)) {
-            return InteractiveLearnViewModel(repository) as T
-        }
+//        if (modelClass.isAssignableFrom(InteractiveLearnViewModel::class.java)) {
+//            return InteractiveLearnViewModel(repository) as T
+//        }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }
 }

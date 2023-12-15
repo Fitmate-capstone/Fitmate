@@ -31,6 +31,8 @@ interface SchenduleExerciseDao {
     @Insert
     suspend fun insertExercise(exercise: SchenduleExerciseEntity)
 
+    @Query("UPDATE schendule_exercise SET isFinished = 1 WHERE id_exercise = :workoutId AND dateString = :dateString")
+    suspend fun updateExerciseSchedule(workoutId: Long , dateString: String)
 
 
     @Query("DELETE FROM schendule_exercise WHERE dateString = :dateString")

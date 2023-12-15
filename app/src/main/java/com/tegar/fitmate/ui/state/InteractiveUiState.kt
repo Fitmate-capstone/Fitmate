@@ -1,6 +1,7 @@
 package com.tegar.fitmate.ui.state
 
 data class InteractiveUiState(
+    val exerciseId : Long = 0 ,
     val isTutorialScreen : Boolean = true,
     val tutorialStep : Int = 1,
     val score : Int = 0,

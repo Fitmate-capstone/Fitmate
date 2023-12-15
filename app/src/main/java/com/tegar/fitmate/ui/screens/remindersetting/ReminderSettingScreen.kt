@@ -35,9 +35,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,10 +60,13 @@ import androidx.compose.ui.window.DialogProperties
 import com.tegar.fitmate.data.notification.DailyReminder
 import com.tegar.fitmate.data.notification.NotificationStatus
 import com.tegar.fitmate.data.notification.PreferencesManager
+import com.tegar.fitmate.ui.theme.lightblue120
+import com.tegar.fitmate.ui.theme.lightblue20
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
 import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
+import com.tegar.fitmate.ui.theme.neutral90
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalTime
@@ -74,13 +80,11 @@ fun ReminderSettingScreen(
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
-
     var showTimePicker by remember { mutableStateOf(false) }
     val state = rememberTimePickerState()
     val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
     val dailyReminder = DailyReminder()
     var notificationStatus by  remember { mutableStateOf(NotificationStatus.getNotificationStatus(context)) }
-
     val snackState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
 
@@ -131,7 +135,19 @@ fun ReminderSettingScreen(
                     showTimePicker = false
                 },
             ) {
-                TimePicker(state = state)
+                TimePicker(
+                    colors =  TimePickerDefaults.colors(
+                        timeSelectorSelectedContainerColor = lightblue120,
+                        timeSelectorSelectedContentColor = lightblue60,
+                        periodSelectorSelectedContainerColor = lightblue120,
+                        periodSelectorSelectedContentColor = lightblue60,
+                        timeSelectorUnselectedContainerColor = lightblue120,
+
+
+
+                    ),
+
+                            state = state)
             }
         }
         PrefenceTurnOnOff("Notification " , notificationStatus, onChange = {
@@ -353,6 +369,10 @@ fun PrefenceTurnOnOff(
 
             }
             Switch(
+                colors = SwitchDefaults.colors(
+                    checkedTrackColor = lightblue60,
+                    checkedThumbColor = neutral90
+                ),
                 checked = notificationStatus,
                 onCheckedChange = { it ->
                     onChange(it)

@@ -14,6 +14,8 @@ interface SchenduleExerciseType {
     fun isExerciseAlreadyExist(date : String, exerciseId : Long) : List<SchenduleExerciseEntity>
     fun getAllExerciseByDate(date : String) :Flow<List<SchenduleExerciseEntity>>
 
+    suspend fun updateExerciseSchedule(workoutId: Long, dateString: String)
+
     suspend fun deleteScheduleByDate(date: String)
     suspend fun deleteExercise(exercise: SchenduleExerciseEntity)
 }

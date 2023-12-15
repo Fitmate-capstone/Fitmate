@@ -110,6 +110,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
@@ -152,12 +153,7 @@ import kotlin.math.atan2
 fun InteractiveLearnScreen(
     workoutId: Long,
     navigateBack: () -> Unit,
-    viewModel: InteractiveLearnViewModel = viewModel(
-        factory = ViewModelFactory(
-            Injection.provideRepository()
-        )
-    ),
-
+    viewModel: InteractiveLearnViewModel = hiltViewModel()
     ) {
 
     var lens by remember { mutableStateOf(CameraSelector.LENS_FACING_FRONT) }

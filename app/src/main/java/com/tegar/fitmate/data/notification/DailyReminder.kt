@@ -81,7 +81,7 @@ class DailyReminder : BroadcastReceiver() {
         val timeString = context.resources.getString(R.string.notification_message_format)
 
         content.forEach{
-            val scheduleData = String.format(timeString, it.exercise_category,it.exercise_calori, it.name_exercise)
+            val scheduleData = String.format(timeString, it.exercise_category,it.exercise_muscle_target, it.name_exercise)
             notificationStyle.addLine(scheduleData)
 
         }
