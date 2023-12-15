@@ -109,10 +109,7 @@ dependencies {
     // TFLITE
 
 
-    implementation("org.tensorflow:tensorflow-lite:2.5.0")
-    implementation("org.tensorflow:tensorflow-lite-gpu:2.5.0")
-    implementation("org.tensorflow:tensorflow-lite-support:0.3.0")
-    implementation("com.google.mlkit:pose-detection:18.0.0-beta3")
+
     implementation("com.google.mlkit:pose-detection-accurate:18.0.0-beta3")
     implementation("com.google.accompanist:accompanist-pager:0.28.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")

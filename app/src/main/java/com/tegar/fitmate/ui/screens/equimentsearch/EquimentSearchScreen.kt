@@ -74,6 +74,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EquimentSearchScreen(
+    navigateToDetail: (workoutId: Long) -> Unit,
+
     viewModel: EquimentSearchViewModel = viewModel(
         factory = ViewModelFactory(
             Injection.provideRepository()
@@ -113,7 +115,7 @@ fun EquimentSearchScreen(
             sheetContainerColor = neutral80,
             sheetContentColor = neutral10,
             sheetContent = {
-                PeekContent()
+                PeekContent(navigateToDetail)
             }) { padding ->
             Column(
                 modifier = Modifier

@@ -2,6 +2,8 @@ package com.tegar.fitmate.ui.composables
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
@@ -11,32 +13,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tegar.fitmate.R
+import com.tegar.fitmate.data.local.faker.FakeData
 
 
 @Composable
-fun PeekContent() {
+fun PeekContent(
+    navigateToDetail: (workoutId: Long) -> Unit,
+
+    ) {
     Column(
         Modifier.padding(16.dp)
-    ){
+    ) {
         Text(
-            "Cable crossover machine", style = MaterialTheme.typography.bodyMedium.copy(
+            "Dumbbell", style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Bold
             )
         )
         Text(
-            "Berikut adalah latihan yang bisa anda lakukan Dengan ",
-            style = MaterialTheme.typography.bodySmall
+            "Here are some exercises you can do.",
+            style = MaterialTheme.typography.bodyMedium
         )
-
-
-        ExerciseItem(
-            name = "Bench Press",
-            img = R.drawable.bench_press
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         ExerciseItem(
-            name = "Squat ",
-            img = R.drawable.squat
+            exercise = FakeData.fakeExerciseData[0],
+            navigateToDetailSchedule = {
+                navigateToDetail(it)
+            }
         )
+
+
     }
 }

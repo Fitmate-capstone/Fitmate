@@ -132,7 +132,6 @@ fun FitmateApp(
                     },
                     navigateToScheduleSetting = {
                         navController.navigate(ScreenRoute.ReminderSetting.route)
-
                     }
                 )
             }
@@ -152,7 +151,9 @@ fun FitmateApp(
             }
 
             composable(ScreenRoute.EquimentSearch.route) {
-                EquimentSearchScreen()
+                EquimentSearchScreen(    navigateToDetail = { workoutId ->
+                    navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
+                },)
             }
 
             composable(ScreenRoute.ReminderSetting.route) {

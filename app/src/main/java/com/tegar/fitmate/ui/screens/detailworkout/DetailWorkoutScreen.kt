@@ -21,21 +21,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Flip
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -61,7 +55,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,35 +63,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.decode.VideoFrameDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.Exercise
-import com.tegar.fitmate.data.model.Muscle
-import com.tegar.fitmate.data.model.SchenduleExerciseInput
 import com.tegar.fitmate.data.util.UiState
-import com.tegar.fitmate.di.Injection
-import com.tegar.fitmate.ui.MultipleViewModelFactory
-import com.tegar.fitmate.ui.screens.ViewModelFactory
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
 import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
 import com.tegar.fitmate.ui.util.formatDate
 import com.tegar.fitmate.ui.util.formatSteps
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
