@@ -121,7 +121,7 @@ fun FitmateApp(
                 val context = LocalContext.current
                 InteractiveLearnScreen(
                     workoutId = workoutId,
-                    navigateBack = { navController.navigateUp() },
+                    navigateToHome = { navController.navigate(ScreenRoute.Home.route)},
                 )
             }
             composable(ScreenRoute.Schendule.route) {

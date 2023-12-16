@@ -52,6 +52,7 @@ import com.tegar.fitmate.R
 import com.tegar.fitmate.ui.composables.SliderBanner
 import com.tegar.fitmate.ui.screens.model.UserData
 import com.tegar.fitmate.ui.theme.neutral10
+import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.util.Locale
@@ -83,6 +84,10 @@ fun ProfileScreen(
                 Text("Login to fitmate " , style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 20.sp
                 ))
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Login for Sync your fitness feats in the cloud and unlock achievements, " , style = MaterialTheme.typography.bodyMedium.copy(
+                    color = neutral30,
+                    fontSize = 14.sp))
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(

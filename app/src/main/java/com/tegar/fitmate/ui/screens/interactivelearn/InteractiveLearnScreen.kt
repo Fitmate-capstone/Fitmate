@@ -102,7 +102,7 @@ import kotlin.math.atan2
 @Composable
 fun InteractiveLearnScreen(
     workoutId: Long,
-    navigateBack: () -> Unit,
+    navigateToHome: () -> Unit,
     viewModel: InteractiveLearnViewModel = hiltViewModel()
     ) {
 
@@ -404,7 +404,7 @@ fun InteractiveLearnScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
                                     FilledTonalButton(
                                         onClick = {
-
+                                            navigateToHome()
                                         },
                                         elevation = ButtonDefaults.buttonElevation(
                                             defaultElevation = 2.dp
@@ -423,7 +423,7 @@ fun InteractiveLearnScreen(
 
 
                                         Text(
-                                            "View Exercise Summary  ",
+                                            "Back to home ",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontFamily = FontFamily.Default,
                                                 fontSize = 16.sp,
