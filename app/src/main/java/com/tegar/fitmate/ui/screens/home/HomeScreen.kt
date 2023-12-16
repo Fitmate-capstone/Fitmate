@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.util.UiState
@@ -40,9 +41,7 @@ import com.tegar.fitmate.ui.theme.satoshiFontFamily
 @Composable
 fun HomeScreen(
     navigateToDetail: (Long) -> Unit,
-    viewModel: HomeViewModel = viewModel(
-        factory = ViewModelFactory(Injection.provideRepository())
-    ),
+    viewModel: HomeViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 
     ) {
@@ -106,7 +105,7 @@ fun HomeScreen(
 
                         is UiState.Success -> {
 
-                            if (uiState.data.isEmpty()) {
+                            if (uiState.data.data?.isEmpty() == true) {
                                 Text(stringResource(id = R.string.empty_exercise_message))
                             } else {
                                 ListSection(
@@ -120,13 +119,14 @@ fun HomeScreen(
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                     ) {
 
-                                        items(uiState.data, key = { it.id }) { muscle ->
+                                        items(uiState.data.data.orEmpty(), key = { (it?.id ?: 0) }) { muscle ->
+                                            if (muscle?.id  != null && muscle.name != null) {
+                                                Chip(id = muscle?.id,
+                                                    value = muscle.name,
+                                                    isActive = activeMuscleId == muscle.id,
 
-                                            Chip(id = muscle.id,
-                                                value = muscle.name,
-                                                isActive = activeMuscleId == muscle.id,
-
-                                                onChipClick = { viewModel.setActiveMuscleId(muscle.id) })
+                                                    onChipClick = { viewModel.setActiveMuscleId(muscle.id) })
+                                            }
                                         }
                                     }
                                 }

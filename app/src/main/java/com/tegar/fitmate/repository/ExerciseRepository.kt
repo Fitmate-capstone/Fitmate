@@ -1,19 +1,25 @@
 package com.tegar.fitmate.repository
 
+import com.google.gson.Gson
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.remote.model.MuscleResponse
+import com.tegar.fitmate.data.remote.model.MuscleTarget
+import com.tegar.fitmate.data.remote.retrofit.ExerciseApiService
+import com.tegar.fitmate.data.remote.retrofit.MlApiService
+import com.tegar.fitmate.data.util.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import retrofit2.HttpException
 import javax.inject.Inject
 
-class ExerciseRepository @Inject constructor(){
+class ExerciseRepository @Inject constructor(private val exerciseApiService: ExerciseApiService){
 
     private val exercises = mutableListOf<Exercise>()
     private val exercisesByMuscle = mutableListOf<Exercise>()
 
-    private val muscles= mutableListOf<Muscle>()
 
     init {
         if (exercises.isEmpty()) {
@@ -41,13 +47,9 @@ class ExerciseRepository @Inject constructor(){
             }
         }
 
-        if (muscles.isEmpty()) {
-            FakeData.fakeMuscleData.forEach { muscle ->
-                muscles.add(muscle)
-
-            }
-        }
     }
+
+
 
     fun getAllExercise(): Flow<List<Exercise>> {
         return flowOf(exercises)
@@ -58,24 +60,21 @@ class ExerciseRepository @Inject constructor(){
         return flowOf(exercisesByMuscle)
     }
 
-    fun getAllMuscleCategory(): Flow<List<Muscle>> {
-        return flowOf(muscles)
+    fun getAllMuscleCategory(): Flow<UiState<MuscleResponse>> = flow {
+        emit(UiState.Loading)
+        try{
+            val muscleResponse = exerciseApiService.getMuscleList()
+            emit(UiState.Success(muscleResponse))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, MuscleResponse::class.java)
+            errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
+        }
     }
     fun getWorkoutById(workoutId: Long): Flow<Exercise> {
         return flow {
 
             emit(exercises.first { it.id == workoutId })
         }
-    }
-    companion object {
-        @Volatile
-        private var instance: ExerciseRepository? = null
-        fun getInstance(): ExerciseRepository =
-            instance ?: synchronized(this) {
-                ExerciseRepository().apply {
-                    instance = this
-                }
-            }
-
     }
 }

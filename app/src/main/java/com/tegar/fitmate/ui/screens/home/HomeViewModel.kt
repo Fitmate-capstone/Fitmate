@@ -5,14 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val exerciseRepository: ExerciseRepository) : ViewModel() {
     private val _exrcisesState: MutableStateFlow<UiState<List<Exercise>>> = MutableStateFlow(UiState.Loading)
     val exrcisesState: StateFlow<UiState<List<Exercise>>>
         get() = _exrcisesState
@@ -23,8 +27,8 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
         get() = _discoverExerciseState
 
 
-    private val _muscleTargetState : MutableStateFlow<UiState<List<Muscle>>> = MutableStateFlow(UiState.Loading)
-    val muscleTargetState : StateFlow<UiState<List<Muscle>>>
+    private val _muscleTargetState : MutableStateFlow<UiState<MuscleResponse>> = MutableStateFlow(UiState.Loading)
+    val muscleTargetState : StateFlow<UiState<MuscleResponse>>
         get() = _muscleTargetState
 
 
@@ -60,7 +64,7 @@ class HomeViewModel(private val exerciseRepository: ExerciseRepository) : ViewMo
             exerciseRepository.getAllMuscleCategory().catch { exception ->
                 _muscleTargetState.value = UiState.Error(exception.message.orEmpty())
             }.collect { muscle ->
-                _muscleTargetState.value = UiState.Success(muscle)
+                _muscleTargetState.value = muscle
             }
         }
     }

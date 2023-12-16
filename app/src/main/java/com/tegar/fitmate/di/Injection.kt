@@ -6,9 +6,9 @@ import com.tegar.fitmate.repository.ExerciseRepository
 import com.tegar.fitmate.repository.SchenduleExerciseRepository
 
 object Injection {
-    fun provideRepository(): ExerciseRepository {
-        return ExerciseRepository.getInstance()
-    }
+//    fun provideRepository(): ExerciseRepository {
+//        return ExerciseRepository.getInstance()
+//    }
 
 
 
