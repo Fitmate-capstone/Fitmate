@@ -17,9 +17,9 @@ class ViewModelFactory(private val repository: ExerciseRepository) :
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             return HomeViewModel(repository) as T
         }
-        if (modelClass.isAssignableFrom(EquimentSearchViewModel::class.java)) {
-            return EquimentSearchViewModel() as T
-        }
+//        if (modelClass.isAssignableFrom(EquimentSearchViewModel::class.java)) {
+//            return EquimentSearchViewModel() as T
+//        }
 //        if (modelClass.isAssignableFrom(DetailWorkoutViewModel::class.java)) {
 //            return DetailWorkoutViewModel(repository ) as T
 //        }

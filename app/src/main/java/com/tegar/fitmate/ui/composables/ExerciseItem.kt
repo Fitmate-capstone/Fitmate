@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.ExerciseApi
 import com.tegar.fitmate.ui.theme.doneColor
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
@@ -47,7 +48,7 @@ import com.tegar.fitmate.ui.theme.neutral80
 
 @Composable
 fun ExerciseItem(
-    exercise: Exercise,
+    exercise: ExerciseApi,
     navigateToDetailSchedule: (Long) -> Unit
 
 ) {
@@ -60,7 +61,7 @@ fun ExerciseItem(
             .fillMaxWidth()
             .height(80.dp)
             .clickable {
-                navigateToDetailSchedule(exercise.id)
+                exercise.id?.let { navigateToDetailSchedule(it.toLong()) }
             },
     ) {
         Row(
@@ -76,7 +77,7 @@ fun ExerciseItem(
 
             ) {
                 // image
-                GifImage(70.dp, exercise.Gif)
+                exercise.gifUrl?.let { GifImageApi(70.dp, it) }
             }
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -90,15 +91,17 @@ fun ExerciseItem(
                 ) {
                     Column {
 
-                        Text(
-                            exercise.name,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = neutral10,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
-                            ),
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        exercise.name?.let {
+                            Text(
+                                it,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = neutral10,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                ),
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Row(
@@ -116,7 +119,7 @@ fun ExerciseItem(
                             Text(
                                 text = stringResource(
                                     R.string.calori_format,
-                                    exercise.calEstimation.toInt()
+                                    exercise?.calEstimation ?: ""
                                 ),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = neutral10

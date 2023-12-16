@@ -65,6 +65,7 @@ fun ProfileScreen(
     onSignOut: () -> Unit,
     redirectToHome: () -> Unit,
 ) {
+    
     val currentLocale = LocalContext.current.resources.configuration
     var selectedLanguage by remember { mutableStateOf(Locale.getDefault().language) }
     val context = LocalContext.current
