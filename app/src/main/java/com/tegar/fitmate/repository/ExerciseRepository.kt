@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.remote.model.ExerciseResponse
 import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.remote.model.MuscleTarget
 import com.tegar.fitmate.data.remote.retrofit.ExerciseApiService
@@ -55,9 +56,17 @@ class ExerciseRepository @Inject constructor(private val exerciseApiService: Exe
         return flowOf(exercises)
     }
 
-    fun getWorkoutByIdMuscle(muscleId: Int): Flow<List<Exercise>> {
-        val exercisesByMuscle = exercises.filter { it.muscle.id == muscleId }
-        return flowOf(exercisesByMuscle)
+    fun getWorkoutByIdMuscle(muscleId: Int): Flow<UiState<ExerciseResponse>>  = flow  {
+        emit(UiState.Loading)
+        try {
+            val muscleResponse = exerciseApiService.getExerciseList(muscleId)
+            emit(UiState.Success(muscleResponse))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, ExerciseResponse::class.java)
+            errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
+        }
+
     }
 
     fun getAllMuscleCategory(): Flow<UiState<MuscleResponse>> = flow {

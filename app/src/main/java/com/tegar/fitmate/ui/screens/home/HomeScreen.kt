@@ -35,6 +35,7 @@ import com.tegar.fitmate.ui.composables.Chip
 import com.tegar.fitmate.ui.composables.ExerciseGridCard
 import com.tegar.fitmate.ui.composables.ExerciseHorizontalCard
 import com.tegar.fitmate.ui.composables.ListSection
+import com.tegar.fitmate.ui.composables.skeleton.SkeletonMuscleList
 import com.tegar.fitmate.ui.screens.ViewModelFactory
 import com.tegar.fitmate.ui.theme.satoshiFontFamily
 
@@ -99,7 +100,16 @@ fun HomeScreen(
                 viewModel.muscleTargetState.collectAsState(initial = UiState.Loading).value.let { uiState ->
                     when (uiState) {
                         is UiState.Loading -> {
-                            Text(stringResource(id = R.string.loading_message))
+                            ListSection(
+                                title = stringResource(id = R.string.section_discover_title),
+                                subtitle = stringResource(
+                                    id = R.string.section_discover_subtitle
+                                )
+                            ) {
+
+                                SkeletonMuscleList()
+
+                            }
                             viewModel.fetchListMuscle()
                         }
 
@@ -119,13 +129,19 @@ fun HomeScreen(
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                     ) {
 
-                                        items(uiState.data.data.orEmpty(), key = { (it?.id ?: 0) }) { muscle ->
-                                            if (muscle?.id  != null && muscle.name != null) {
+                                        items(
+                                            uiState.data.data.orEmpty(),
+                                            key = { (it?.id ?: 0) }) { muscle ->
+                                            if (muscle?.id != null && muscle.name != null) {
                                                 Chip(id = muscle?.id,
                                                     value = muscle.name,
                                                     isActive = activeMuscleId == muscle.id,
 
-                                                    onChipClick = { viewModel.setActiveMuscleId(muscle.id) })
+                                                    onChipClick = {
+                                                        viewModel.setActiveMuscleId(
+                                                            muscle.id
+                                                        )
+                                                    })
                                             }
                                         }
                                     }
@@ -152,21 +168,21 @@ fun HomeScreen(
 
                         is UiState.Success -> {
 
-                            if (uiState.data.isEmpty()) {
-                                Text(stringResource(id = R.string.empty_exercise_message))
-                            } else {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Adaptive(155.dp),
-                                    contentPadding = PaddingValues(16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                                    modifier = Modifier.height(400.dp)
-                                ) {
-                                    items(uiState.data, key = { it.name }) { exercise ->
-                                        ExerciseGridCard(exercise = exercise, navigateToDetail)
-                                    }
-                                }
-                            }
+//                            if (uiState.data.()) {
+//                                Text(stringResource(id = R.string.empty_exercise_message))
+//                            } else {
+//                                LazyVerticalGrid(
+//                                    columns = GridCells.Adaptive(155.dp),
+//                                    contentPadding = PaddingValues(16.dp),
+//                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+//                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+//                                    modifier = Modifier.height(400.dp)
+//                                ) {
+//                                    items(uiState.data, key = { it.name }) { exercise ->
+//                                        ExerciseGridCard(exercise = exercise, navigateToDetail)
+//                                    }
+//                                }
+//                            }
 
 
                         }

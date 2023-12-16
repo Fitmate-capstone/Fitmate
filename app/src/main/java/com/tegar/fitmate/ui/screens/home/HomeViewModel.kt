@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.remote.model.ExerciseResponse
 import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
@@ -22,8 +23,8 @@ class HomeViewModel @Inject constructor(private val exerciseRepository: Exercise
         get() = _exrcisesState
 
 
-    private val _discoverExerciseState: MutableStateFlow<UiState<List<Exercise>>> = MutableStateFlow(UiState.Loading)
-    val discoverExerciseState: StateFlow<UiState<List<Exercise>>>
+    private val _discoverExerciseState: MutableStateFlow<UiState<ExerciseResponse>> = MutableStateFlow(UiState.Loading)
+    val discoverExerciseState: StateFlow<UiState<ExerciseResponse>>
         get() = _discoverExerciseState
 
 
@@ -51,8 +52,8 @@ class HomeViewModel @Inject constructor(private val exerciseRepository: Exercise
         viewModelScope.launch {
             exerciseRepository.getWorkoutByIdMuscle(muscleId).catch { exception ->
                 _discoverExerciseState.value = UiState.Error(exception.message.orEmpty())
-            }.collect { exercises ->
-                _discoverExerciseState.value = UiState.Success(exercises)
+            }.collect { exercise ->
+                _discoverExerciseState.value = exercise
             }
         }
     }
