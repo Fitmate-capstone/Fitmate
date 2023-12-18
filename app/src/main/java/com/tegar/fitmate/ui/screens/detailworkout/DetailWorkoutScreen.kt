@@ -60,6 +60,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -413,7 +414,9 @@ fun WorkoutTutorial(
 
 @Composable
 fun WorkoutVideo() {
-    Text("No available for now", style = MaterialTheme.typography.bodyMedium)
+    Text("Sorry , No Available for now", style = MaterialTheme.typography.bodyMedium.copy(
+        textAlign = TextAlign.Center
+    ))
 
 }
 
@@ -456,7 +459,7 @@ fun WorkoutInformationTab(exercise: DetailExercise) {
         when (selectedTabIndex) {
             0 -> OverviewContent(exercise.overview ?: "")
             1 -> StepByStepContent(exercise.step ?: "")
-            2 -> MuscleTargetContent()
+            2 -> MuscleTargetContent(exercise.muscle?.name ?: "")
         }
     }
 }
@@ -486,7 +489,7 @@ fun StepByStepContent(step: String) {
 }
 
 @Composable
-fun MuscleTargetContent() {
+fun MuscleTargetContent(muscle : String) {
     // Content for Muscle Target tab
-    Text("Muscle Target content goes here")
+    Text("Muscle Target for this exercise is $muscle")
 }
