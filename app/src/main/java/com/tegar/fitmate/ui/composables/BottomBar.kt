@@ -71,11 +71,7 @@ fun BottomBar(
 
                 selected = currentRoute == item.screen.route,
                 label = {
-                    Text(item.screen.route.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(
-                            Locale.ROOT
-                        ) else it.toString()
-                    })
+                    Text(item.title)
                 },
                 onClick = {
                     navController.navigate(item.screen.route) {

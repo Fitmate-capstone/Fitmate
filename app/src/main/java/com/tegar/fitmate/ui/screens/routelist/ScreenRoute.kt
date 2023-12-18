@@ -2,7 +2,9 @@ package com.tegar.fitmate.ui.screens.routelist
 
 sealed class ScreenRoute(val route: String) {
     object Home : ScreenRoute("home")
-    object Explore : ScreenRoute("explore")
+    object Explore : ScreenRoute("explore/{searchQuery}"){
+        fun createRoute(searchQuery: String) = "explore/$searchQuery"
+    }
     object Profile : ScreenRoute("profile")
 
 

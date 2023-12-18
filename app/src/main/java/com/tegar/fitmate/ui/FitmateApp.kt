@@ -10,7 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -61,15 +65,28 @@ fun FitmateApp(
         ScreenRoute.Schendule.route
     )
     val context = LocalContext.current
+    var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
 
-            if (currentRoute == ScreenRoute.Home.route) {
+            if (currentRoute == ScreenRoute.Home.route || currentRoute == ScreenRoute.Explore.route) {
                 AppBar(navigatToEquimentSearch = {
                     navController.navigate(ScreenRoute.EquimentSearch.route)
 
-                })
+                },
+                    navigateToExplore = { newSearchQuery ->
+                        searchQuery = newSearchQuery // Update the searchQuery
+                        navController.navigate(ScreenRoute.Explore.createRoute(newSearchQuery)) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = true
+                            }
+                            launchSingleTop = false
+                            restoreState = false
+                        }
+                    }
+
+                )
             }
         },
         bottomBar = {
@@ -82,7 +99,7 @@ fun FitmateApp(
         }) { paddingValue ->
         NavHost(
             navController = navController,
-            startDestination = if(OnBordingPrefence.isOnboardingCompleted(context)) ScreenRoute.Home.route else ScreenRoute.OnBoarding.route,
+            startDestination = if (OnBordingPrefence.isOnboardingCompleted(context)) ScreenRoute.Home.route else ScreenRoute.OnBoarding.route,
             modifier = Modifier.padding(paddingValue)
         ) {
             composable(ScreenRoute.Home.route) {
@@ -108,14 +125,20 @@ fun FitmateApp(
                     navigateBack = { navController.navigateUp() },
                     navigateToInteractiveArea = { workoutId ->
                         navController.navigate(ScreenRoute.InteractiveLearn.createRoute(workoutId))
-
                     }
                 )
             }
 
-            composable(ScreenRoute.Explore.route) {
+            composable(ScreenRoute.Explore.route ,                arguments = listOf(
+                navArgument("searchQuery") { type = NavType.StringType }),) {
+                val searchQuery = it.arguments?.getString("searchQuery") ?: ""
 
-                ExploreScreen()
+                ExploreScreen(
+                    searchQuery = searchQuery,
+                    navigateToDetail = { workoutId ->
+                        navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
+                    },
+                )
             }
             composable(ScreenRoute.OnBoarding.route) {
                 OnBoardingScreen(
@@ -133,7 +156,7 @@ fun FitmateApp(
                 val context = LocalContext.current
                 InteractiveLearnScreen(
                     workoutId = workoutId,
-                    navigateToHome = { navController.navigate(ScreenRoute.Home.route)},
+                    navigateToHome = { navController.navigate(ScreenRoute.Home.route) },
                 )
             }
             composable(ScreenRoute.Schendule.route) {
@@ -163,9 +186,11 @@ fun FitmateApp(
             }
 
             composable(ScreenRoute.EquimentSearch.route) {
-                EquimentSearchScreen(    navigateToDetail = { workoutId ->
-                    navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
-                },)
+                EquimentSearchScreen(
+                    navigateToDetail = { workoutId ->
+                        navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
+                    },
+                )
             }
 
             composable(ScreenRoute.ReminderSetting.route) {

@@ -53,10 +53,10 @@ class ExerciseRepository @Inject constructor(private val exerciseApiService: Exe
 
 
 
-    fun getTopExercise(): Flow<UiState<ExerciseResponse>>  = flow {
+    fun getTopExercise(limit : Int = 5 ): Flow<UiState<ExerciseResponse>>  = flow {
         emit(UiState.Loading)
         try {
-            val muscleResponse = exerciseApiService.getTopRatedExercise()
+            val muscleResponse = exerciseApiService.getTopRatedExercise(limit)
             emit(UiState.Success(muscleResponse))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -101,6 +101,18 @@ class ExerciseRepository @Inject constructor(private val exerciseApiService: Exe
             val errorResponse = Gson().fromJson(errorBody, DetailExerciseRespone::class.java)
             errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
         }
+    }
 
+    fun searchExercise(query : String ) : Flow<UiState<ExerciseResponse>>  = flow{
+        emit(UiState.Loading)
+        try{
+            val detailExerciseResponse = exerciseApiService.searchExercise(query)
+            emit(UiState.Success(detailExerciseResponse))
+
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, ExerciseResponse::class.java)
+            errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
+        }
     }
 }

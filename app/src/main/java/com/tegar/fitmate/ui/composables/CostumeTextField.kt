@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -26,9 +29,11 @@ import androidx.compose.ui.unit.dp
 @Composable
  fun CustomTextField(
     modifier: Modifier = Modifier,
+
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     placeholderText: String = "Placeholder",
+    navigateToExplore: (String) -> Unit,
     fontSize: TextUnit = MaterialTheme.typography.labelMedium.fontSize,
     iconSpacing: Dp = 4.dp
 ) {
@@ -48,6 +53,11 @@ import androidx.compose.ui.unit.dp
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = fontSize
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                navigateToExplore(text)
+            }
         ),
         decorationBox = { innerTextField ->
             Row(

@@ -27,6 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +39,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tegar.fitmate.R
@@ -46,8 +51,13 @@ import com.tegar.fitmate.ui.theme.neutral80
 @Composable
 fun AppBar(
     navigatToEquimentSearch: () -> Unit,
+    navigateToExplore: (String) -> Unit,
+
     modifier: Modifier = Modifier
 ) {
+
+    var query by remember { mutableStateOf(TextFieldValue()) }
+
     TopAppBar(
         title = {
             Box(
@@ -74,8 +84,11 @@ fun AppBar(
                         .height(40.dp),
                     fontSize = 14.sp,
                     placeholderText = "Search",
+                    navigateToExplore = { value ->
+                        navigateToExplore(value)
+                    }
 
-                    )
+                )
             }
         },
         actions = {
@@ -99,5 +112,5 @@ fun AppBar(
         },
 
 
-    )
+        )
 }

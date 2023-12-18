@@ -34,4 +34,9 @@ interface ExerciseApiService {
     suspend fun getTopRatedExercise(
         @Query("limit") id: Int = 5
     ): ExerciseResponse
+
+    @GET("/getExerciseByQuery")
+    suspend fun searchExercise(
+        @Query("query") query: String
+    ): ExerciseResponse
 }
