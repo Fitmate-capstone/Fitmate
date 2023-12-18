@@ -24,7 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Light
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Card
@@ -48,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,9 +66,11 @@ import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.ui.composables.ExerciseItemSchedule
 import com.tegar.fitmate.ui.screens.schendule.SchenduleViewModel
 import com.tegar.fitmate.ui.theme.alertColor
+import com.tegar.fitmate.ui.theme.doneColor
 import com.tegar.fitmate.ui.theme.lightblue120
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
+import com.tegar.fitmate.ui.theme.neutral30
 import com.tegar.fitmate.ui.theme.neutral80
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -81,7 +86,7 @@ fun DetailSchenduleScreen(
 
 ) {
     val context = LocalContext.current
-    Column {
+    Column(modifier = Modifier.fillMaxSize()){
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -145,7 +150,7 @@ fun DetailSchenduleScreen(
 
                                     val state = rememberDismissState(
                                         confirmValueChange = {
-                                            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
+                                            if (it == DismissValue.DismissedToStart ) {
                                                 detailScheduleViewModel.deleteExercise(exercise)
 
                                                 if(uiState.data.size == 1 ){
@@ -153,8 +158,12 @@ fun DetailSchenduleScreen(
                                                 }
 
 
-                                                true
+
+                                            }else if(it == DismissValue.DismissedToEnd) {
+                                                detailScheduleViewModel.updateExerciseSchedule(exercise.id_exercise,exercise.dateString)
+
                                             }
+
                                             true
                                         }
                                     )
@@ -165,7 +174,7 @@ fun DetailSchenduleScreen(
                                         background = {
                                             val color = when (state.dismissDirection) {
                                                 DismissDirection.EndToStart -> alertColor
-                                                DismissDirection.StartToEnd ->  alertColor
+                                                DismissDirection.StartToEnd ->  doneColor
                                                 null -> Color.Transparent
                                             }
                                             Box(
@@ -181,8 +190,8 @@ fun DetailSchenduleScreen(
                                                     modifier = Modifier.align(Alignment.CenterEnd)
                                                 )
                                                 Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Delete",
+                                                    imageVector = Icons.Default.Done,
+                                                    contentDescription = "Done",
                                                     modifier = Modifier.align(Alignment.CenterStart)
                                                 )
                                             }
@@ -210,6 +219,22 @@ fun DetailSchenduleScreen(
 
             }
         }
+        Box(
+            modifier = Modifier.fillMaxHeight().padding(16.dp),
+            contentAlignment =  Alignment.BottomEnd
+        ){
+           Row(
+               horizontalArrangement = Arrangement.spacedBy(12.dp)
+           ) {
+               Icon(imageVector = Icons.Filled.Info , contentDescription = null , tint = neutral30)
+               Text(
+                   "You can remove items by swiping left and marking the exercise as done by swiping right." , style = MaterialTheme.typography.bodyMedium.copy(
+                       textAlign = TextAlign.Start,
+                       color = neutral30
+                   ))
+           }
+        }
+
     }
 
 }

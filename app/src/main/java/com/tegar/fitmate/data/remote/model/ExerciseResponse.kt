@@ -8,7 +8,7 @@ data class ExerciseResponse(
 	val code: Int? = null,
 
 	@field:SerializedName("data")
-	val data: ExerciseData? = null,
+	val data: List<ExerciseData?>? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null,
@@ -56,4 +56,3 @@ data class ExerciseData(
 	@field:SerializedName("is_support_interactive")
 	val isSupportInteractive: Int? = null
 )
-

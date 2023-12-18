@@ -2,6 +2,8 @@ package com.tegar.fitmate.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tegar.fitmate.data.local.dao.TodayExerciseSummary
+import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
@@ -9,18 +11,22 @@ import com.tegar.fitmate.data.remote.model.ExerciseResponse
 import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
+import com.tegar.fitmate.repository.SchenduleExerciseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val exerciseRepository: ExerciseRepository) : ViewModel() {
-    private val _exrcisesState: MutableStateFlow<UiState<List<Exercise>>> = MutableStateFlow(UiState.Loading)
-    val exrcisesState: StateFlow<UiState<List<Exercise>>>
-        get() = _exrcisesState
+class HomeViewModel @Inject constructor(private val exerciseRepository: ExerciseRepository ,     private val schenduleExerciseRepository: SchenduleExerciseRepository
+) : ViewModel() {
+    private val _exercisePopular: MutableStateFlow<UiState<ExerciseResponse>> = MutableStateFlow(UiState.Loading)
+    val exercisePopular: StateFlow<UiState<ExerciseResponse>>
+        get() = _exercisePopular
 
 
     private val _discoverExerciseState: MutableStateFlow<UiState<ExerciseResponse>> = MutableStateFlow(UiState.Loading)
@@ -38,12 +44,21 @@ class HomeViewModel @Inject constructor(private val exerciseRepository: Exercise
         get() = _activeMuscleId
 
 
-    fun fetchListWorkout() {
+    private val _todaySchedule : MutableStateFlow<UiState<TodayExerciseSummary>> = MutableStateFlow(UiState.Loading)
+
+    val todaySchedule :  StateFlow<UiState<TodayExerciseSummary>>
+        get() = _todaySchedule  .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UiState.Loading
+        )
+
+    fun fetchPopularWorkout() {
         viewModelScope.launch {
-            exerciseRepository.getAllExercise().catch { exception ->
-                _exrcisesState.value = UiState.Error(exception.message.orEmpty())
+            exerciseRepository.getTopExercise().catch { exception ->
+                _exercisePopular.value = UiState.Error(exception.message.orEmpty())
             }.collect { exercises ->
-                _exrcisesState.value = UiState.Success(exercises)
+                _exercisePopular.value = exercises
             }
         }
     }
@@ -54,6 +69,22 @@ class HomeViewModel @Inject constructor(private val exerciseRepository: Exercise
                 _discoverExerciseState.value = UiState.Error(exception.message.orEmpty())
             }.collect { exercise ->
                 _discoverExerciseState.value = exercise
+            }
+        }
+    }
+
+
+    fun getTodaySchedule() {
+        viewModelScope.launch {
+            schenduleExerciseRepository.getTodayExerciseSummary().catch { exception ->
+                _todaySchedule.value = UiState.Error(exception.message.orEmpty())
+            }.collect { schendule ->
+                if (schendule != null) {
+                    _todaySchedule.value = UiState.Success(schendule)
+                } else {
+                    // Handle the case when schendule is null
+                    _todaySchedule.value = UiState.Success(TodayExerciseSummary("N/A", "",0, 0, 0))
+                }
             }
         }
     }

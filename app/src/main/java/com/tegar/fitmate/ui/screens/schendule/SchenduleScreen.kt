@@ -1,5 +1,6 @@
 package com.tegar.fitmate.ui.screens.schendule
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +34,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +59,7 @@ fun SchenduleScreen(
     navigateToScheduleSetting : () -> Unit,
     schenduleViewModel: SchenduleViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val dailyReminder = DailyReminder()
+
 
     Box(modifier = Modifier.padding(10.dp)) {
         schenduleViewModel.schenduleState.collectAsState().value.let { uiState ->
@@ -68,7 +70,12 @@ fun SchenduleScreen(
                 }
                 is UiState.Success -> {
                     if (uiState.data.isEmpty()) {
-                        Text(stringResource(id = R.string.empty_exercise_message))
+                        Column ( horizontalAlignment = Alignment.CenterHorizontally , verticalArrangement = Arrangement.Center , modifier = Modifier.fillMaxSize()){
+                            Image(painter = painterResource(id = R.drawable.onboarding_2) , contentDescription = null)
+                            Text(stringResource(id = R.string.empty_schedule) , style = MaterialTheme.typography.bodyMedium.copy(
+                                textAlign = TextAlign.Center
+                            ))
+                        }
                     } else {
                         LazyColumn {
 

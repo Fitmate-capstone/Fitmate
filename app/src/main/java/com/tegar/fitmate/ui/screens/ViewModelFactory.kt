@@ -14,9 +14,9 @@ class ViewModelFactory(private val repository: ExerciseRepository) :
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(repository) as T
-        }
+//        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+//            return HomeViewModel(repository) as T
+//        }
 //        if (modelClass.isAssignableFrom(EquimentSearchViewModel::class.java)) {
 //            return EquimentSearchViewModel() as T
 //        }

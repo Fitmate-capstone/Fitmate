@@ -39,6 +39,14 @@ class DetailScheduleViewModel @Inject constructor(
             }
         }
     }
+
+    fun updateExerciseSchedule(workoutId: Long, dateString: String) {
+        viewModelScope.launch {
+            _exerciseState.value = UiState.Loading
+
+            schenduleExerciseRepository.updateExerciseSchedule(workoutId, dateString)
+        }
+    }
     fun deleteExercise(exerciseSchendule: SchenduleExerciseEntity) {
         viewModelScope.launch {
             _exerciseState.value = UiState.Loading

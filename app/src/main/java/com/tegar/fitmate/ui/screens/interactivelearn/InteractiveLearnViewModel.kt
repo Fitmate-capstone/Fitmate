@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.DetailExercise
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
 import com.tegar.fitmate.repository.SchenduleExerciseRepository
@@ -35,13 +37,13 @@ class InteractiveLearnViewModel  @Inject constructor(    private val repository:
     private val _uiState = MutableStateFlow(InteractiveUiState())
     val uiState: StateFlow<InteractiveUiState> = _uiState.asStateFlow()
 
-    private val _exercise: MutableStateFlow<UiState<Exercise>> =
+    private val _exercise: MutableStateFlow<UiState<DetailExerciseRespone>> =
         MutableStateFlow(UiState.Loading)
 
     private var timer: CountDownTimer? = null
     private val initialTime = MutableLiveData<Long>()
     private val currentTime = MutableLiveData<Long>()
-    val exercise: StateFlow<UiState<Exercise>>
+    val exercise: StateFlow<UiState<DetailExerciseRespone>>
         get() = _exercise
 
     private val _canPlaySound: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -67,20 +69,36 @@ class InteractiveLearnViewModel  @Inject constructor(    private val repository:
     private val _eventCountDownFinish = MutableLiveData<Boolean>()
     val eventCountDownFinish: LiveData<Boolean> = _eventCountDownFinish
 
+    fun initialateCounter(exerciseId : Long? , repetition : Int? , set : Int?, ) {
+
+        if(exerciseId != null) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    exerciseId = exerciseId
+                )
+
+
+            }
+
+        }
+
+        if (repetition != null && set != null) {
+            _maxRepetition.value = repetition
+            _maxSet.value = set
+
+        }
+    }
+
 
     fun getWorkoutById(workoutId: Long) {
         viewModelScope.launch {
             repository.getWorkoutById(workoutId).catch { exception ->
                 _exercise.value = UiState.Error(exception.message.orEmpty())
             }.collect { exercise ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                       exerciseId = exercise.id
-                    )
-                }
-                _exercise.value = UiState.Success(exercise)
-                _maxRepetition.value = exercise.interactiveSetting.repetion
-                _maxSet.value = exercise.interactiveSetting.set
+
+
+                _exercise.value = exercise
+
             }
 
         }

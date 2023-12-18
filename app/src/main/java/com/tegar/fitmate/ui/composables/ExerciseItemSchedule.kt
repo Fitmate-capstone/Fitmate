@@ -63,7 +63,7 @@ fun ExerciseItemSchedule(exercise: SchenduleExerciseEntity, navigateToDetailSche
 
             ) {
                 // image
-                GifImage(70.dp,exercise.exercise_gif_url)
+                GifImageApi(70.dp,exercise.exercise_gif_url)
             }
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,

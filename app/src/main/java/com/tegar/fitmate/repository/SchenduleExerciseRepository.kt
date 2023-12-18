@@ -2,6 +2,7 @@ package com.tegar.fitmate.repository
 
 import android.content.Context
 import com.tegar.fitmate.data.local.dao.SchenduleExerciseDao
+import com.tegar.fitmate.data.local.dao.TodayExerciseSummary
 import com.tegar.fitmate.data.local.database.FitmateDatabase
 import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.SchenduleExercise
@@ -37,6 +38,12 @@ class SchenduleExerciseRepository @Inject constructor(private val db: SchenduleE
     fun getTodaySchedule() : List<SchenduleExerciseEntity> {
         val currentDate = SimpleDateFormat("yyyy-MM-dd").format(Date())
         return db.getExercisesByDate(currentDate)
+    }
+
+
+    fun getTodayExerciseSummary() : Flow<TodayExerciseSummary>{
+        val currentDate = SimpleDateFormat("yyyy-MM-dd").format(Date())
+        return flowOf(db.getExerciseSummaryByDate(currentDate))
     }
 
 

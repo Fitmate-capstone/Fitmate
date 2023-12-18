@@ -37,8 +37,10 @@ import androidx.lifecycle.lifecycleScope
 import com.tegar.fitmate.ui.screens.detailschendule.DetailSchenduleScreen
 import com.tegar.fitmate.ui.screens.equimentsearch.EquimentSearchScreen
 import com.tegar.fitmate.ui.screens.interactivelearn.InteractiveLearnScreen
+import com.tegar.fitmate.ui.screens.onboarding.OnBoardingScreen
 import com.tegar.fitmate.ui.screens.remindersetting.ReminderSettingScreen
 import com.tegar.fitmate.ui.screens.sign_in.GoogleAuthClient
+import com.tegar.fitmate.ui.util.OnBordingPrefence
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +60,7 @@ fun FitmateApp(
         ScreenRoute.Explore.route,
         ScreenRoute.Schendule.route
     )
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -79,7 +82,7 @@ fun FitmateApp(
         }) { paddingValue ->
         NavHost(
             navController = navController,
-            startDestination = ScreenRoute.Home.route,
+            startDestination = if(OnBordingPrefence.isOnboardingCompleted(context)) ScreenRoute.Home.route else ScreenRoute.OnBoarding.route,
             modifier = Modifier.padding(paddingValue)
         ) {
             composable(ScreenRoute.Home.route) {
@@ -87,7 +90,9 @@ fun FitmateApp(
                     navigateToDetail = { workoutId ->
                         navController.navigate(ScreenRoute.DetailWorkout.createRoute(workoutId))
                     },
-
+                    navigateToDetailSchedule = { workoutdate ->
+                        navController.navigate(ScreenRoute.DetailSchedule.createRoute(workoutdate))
+                    },
 
                     )
             }
@@ -111,6 +116,13 @@ fun FitmateApp(
             composable(ScreenRoute.Explore.route) {
 
                 ExploreScreen()
+            }
+            composable(ScreenRoute.OnBoarding.route) {
+                OnBoardingScreen(
+                    navigateToHome = {
+                        navController.navigate(ScreenRoute.Home.route)
+                    }
+                )
             }
             composable(
                 ScreenRoute.InteractiveLearn.route,

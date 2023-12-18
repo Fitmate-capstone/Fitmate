@@ -72,6 +72,8 @@ import coil.size.Size
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.DetailExercise
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
@@ -102,21 +104,23 @@ fun DetailWorkoutScreen(
         }
 
         is UiState.Success -> {
-            val data = (exerciseState as UiState.Success<Exercise>).data
+            val data = (exerciseState as UiState.Success<DetailExerciseRespone>).data
 
 
 
-            DetailContent(
-                navigateBack,
-                data,
-                navigateToInteractiveArea,
-                addToSchendule = { schendule ->
-                    detailWorkoutViewModel.addWorkoutSchendule(schendule)
-                },
+           if(data.data != null) {
+               DetailContent(
+                   navigateBack,
+                   data?.data,
+                   navigateToInteractiveArea,
+                   addToSchendule = { schendule ->
+                       detailWorkoutViewModel.addWorkoutSchendule(schendule)
+                   },
 
 
 
-            )
+                   )
+           }
         }
 
         is UiState.Error -> {
@@ -130,7 +134,7 @@ fun DetailWorkoutScreen(
 @Composable
 fun DetailContent(
     navigateBack: () -> Unit,
-    exercise: Exercise,
+    exercise: DetailExercise,
     navigateToInteractiveArea: (Long) -> Unit,
     addToSchendule: (SchenduleExerciseEntity) -> String,
 
@@ -164,7 +168,7 @@ fun DetailContent(
                         contentDescription = "Back to home screen"
                     )
                 }
-                Text(exercise.name)
+                Text(exercise.name ?: "")
                 Surface(
                     color = neutral80,
                     shape = RoundedCornerShape(10.dp),
@@ -184,7 +188,7 @@ fun DetailContent(
 
                 }
             }
-            WorkoutTutorial(exercise.Gif)
+            WorkoutTutorial(exercise.gifUrl ?: "")
             Spacer(modifier = Modifier.height(100.dp))
             WorkoutInformationTab(exercise)
 
@@ -241,14 +245,14 @@ fun DetailContent(
 
 
                             val data = SchenduleExerciseEntity(
-                                id_exercise = exercise.id,
-                                name_exercise = exercise.name,
-                                exercise_calori = exercise.calEstimation,
-                                exercise_gif_url = exercise.Gif,
-                                exercise_category = exercise.category.name,
+                                id_exercise = exercise.id?.toLong() ?: 0,
+                                name_exercise = exercise.name ?: "",
+                                exercise_calori = exercise.calEstimation ?: 0,
+                                exercise_gif_url = exercise.gifUrl ?: "",
+                                exercise_category = exercise.category?.name ?: "",
                                 dateMillis = datePickerState.selectedDateMillis ?: 0,
                                 dateString = formatDate(datePickerState.selectedDateMillis ?: 0L),
-                                exercise_muscle_target = exercise.muscle.name,
+                                exercise_muscle_target = exercise.muscle?.name ?: "",
                                 isFinished = false,
                             )
 
@@ -290,10 +294,10 @@ fun DetailContent(
                 .align(Alignment.BottomStart)
         ) {
 
-            if (exercise.isSupportInteractive) {
+            if (exercise.isSupportInteractive == 1 ) {
                 FilledTonalButton(
                     onClick = {
-                        navigateToInteractiveArea(exercise.id)
+                        navigateToInteractiveArea(exercise?.id?.toLong() ?: 0)
                     },
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 2.dp
@@ -327,7 +331,7 @@ fun DetailContent(
 
 @Composable
 fun GifImage(
-    @DrawableRes gif: Int,
+    gif: String,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -357,7 +361,7 @@ fun GifImage(
 
 @Composable
 fun WorkoutTutorial(
-    @DrawableRes gif: Int,
+    gif: String,
     modifier: Modifier = Modifier
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -414,7 +418,7 @@ fun WorkoutVideo() {
 }
 
 @Composable
-fun WorkoutInformationTab(exercise: Exercise) {
+fun WorkoutInformationTab(exercise: DetailExercise) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     val tabTitles = listOf("Overview", "Step by Step", "Muscle Target")
@@ -450,8 +454,8 @@ fun WorkoutInformationTab(exercise: Exercise) {
 
         // Content based on selected tab
         when (selectedTabIndex) {
-            0 -> OverviewContent(exercise.explain)
-            1 -> StepByStepContent(exercise.step)
+            0 -> OverviewContent(exercise.overview ?: "")
+            1 -> StepByStepContent(exercise.step ?: "")
             2 -> MuscleTargetContent()
         }
     }
@@ -468,8 +472,10 @@ fun OverviewContent(explain: String) {
 }
 
 @Composable
-fun StepByStepContent(step: Array<String>) {
-    val formattedSteps = formatSteps(step)
+fun StepByStepContent(step: String) {
+    val stepsArray = step?.split(", ")?.toTypedArray() ?: emptyArray()
+
+    val formattedSteps = formatSteps(stepsArray)
 
     // Content for Step by Step tab
     Text(

@@ -10,6 +10,7 @@
     <string name="section_discover_subtitle">Master basics with essential workouts for all levels</string>
 
     <string name="empty_exercise_message">Data empty for now</string>
+    <string name="empty_schedule" >Looks like you haven`t mapped out your workout yet, let`s plan it together. Time to create an exciting exercise schedule! 💪✨</string>
     <string name="error_message">"Something Wrong with server"</string>
     <string name="loading_message">Loading"</string>
     <string name="rating_format">%1$d%% Rate</string>

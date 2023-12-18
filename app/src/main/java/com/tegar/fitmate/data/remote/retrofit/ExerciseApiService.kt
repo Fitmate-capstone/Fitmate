@@ -1,5 +1,6 @@
 package com.tegar.fitmate.data.remote.retrofit
 
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.remote.model.ExerciseResponse
 import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.remote.model.PredictEquimentResponse
@@ -22,5 +23,15 @@ interface ExerciseApiService {
     @GET("/getExercise")
     suspend fun getExerciseList(
         @Query("muscle_id") id: Int
+    ): ExerciseResponse
+
+    @GET("/getDetailExercise")
+    suspend fun getDetailExercise(
+        @Query("exercise_id") id: Int
+    ): DetailExerciseRespone
+
+    @GET("/getTopRatedExercise")
+    suspend fun getTopRatedExercise(
+        @Query("limit") id: Int = 5
     ): ExerciseResponse
 }

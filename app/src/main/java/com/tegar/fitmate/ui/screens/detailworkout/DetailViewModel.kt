@@ -7,6 +7,7 @@ import com.tegar.fitmate.data.local.entity.SchenduleExerciseEntity
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.SchenduleExercise
 import com.tegar.fitmate.data.model.SchenduleExerciseInput
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.repository.ExerciseRepository
 import com.tegar.fitmate.repository.SchenduleExerciseRepository
@@ -25,9 +26,9 @@ class DetailWorkoutViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _exercise: MutableStateFlow<UiState<Exercise>> =
+    private val _exercise: MutableStateFlow<UiState<DetailExerciseRespone>> =
         MutableStateFlow(UiState.Loading)
-    val exercise: StateFlow<UiState<Exercise>>
+    val exercise: StateFlow<UiState<DetailExerciseRespone>>
         get() = _exercise
 
 
@@ -37,7 +38,7 @@ class DetailWorkoutViewModel @Inject constructor(
             repository.getWorkoutById(workoutId).catch { exception ->
                 _exercise.value = UiState.Error(exception.message.orEmpty())
             }.collect{ exercise ->
-                _exercise.value = UiState.Success(exercise)
+                _exercise.value = exercise
             }
         }
     }

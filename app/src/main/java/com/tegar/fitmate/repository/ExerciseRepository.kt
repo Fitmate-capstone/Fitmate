@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
 import com.tegar.fitmate.data.model.Muscle
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.remote.model.ExerciseResponse
 import com.tegar.fitmate.data.remote.model.MuscleResponse
 import com.tegar.fitmate.data.remote.model.MuscleTarget
@@ -52,8 +53,17 @@ class ExerciseRepository @Inject constructor(private val exerciseApiService: Exe
 
 
 
-    fun getAllExercise(): Flow<List<Exercise>> {
-        return flowOf(exercises)
+    fun getTopExercise(): Flow<UiState<ExerciseResponse>>  = flow {
+        emit(UiState.Loading)
+        try {
+            val muscleResponse = exerciseApiService.getTopRatedExercise()
+            emit(UiState.Success(muscleResponse))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, ExerciseResponse::class.java)
+            errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
+        }
+
     }
 
     fun getWorkoutByIdMuscle(muscleId: Int): Flow<UiState<ExerciseResponse>>  = flow  {
@@ -80,10 +90,17 @@ class ExerciseRepository @Inject constructor(private val exerciseApiService: Exe
             errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
         }
     }
-    fun getWorkoutById(workoutId: Long): Flow<Exercise> {
-        return flow {
+    fun getWorkoutById(workoutId: Long): Flow<UiState<DetailExerciseRespone>>  = flow{
+        emit(UiState.Loading)
+        try{
+            val detailExerciseResponse = exerciseApiService.getDetailExercise(workoutId.toInt())
+            emit(UiState.Success(detailExerciseResponse))
 
-            emit(exercises.first { it.id == workoutId })
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, DetailExerciseRespone::class.java)
+            errorResponse.message?.let { UiState.Error(it) }?.let { emit(it) }
         }
+
     }
 }

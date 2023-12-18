@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -43,9 +44,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.ExerciseData
 import com.tegar.fitmate.ui.theme.FitmateTheme
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral30
@@ -53,14 +57,14 @@ import com.tegar.fitmate.ui.theme.neutral30
 
 @Composable
 fun ExerciseHorizontalCard(
-    exercise: Exercise, navigateToDetail: (Long) -> Unit,
+    exercise: ExerciseData, navigateToDetail: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
             .clickable {
-                navigateToDetail(exercise.id)
+                navigateToDetail(exercise.id?.toLong() ?: 0)
             }
             .width(300.dp)
             .height(140.dp)
@@ -73,8 +77,11 @@ fun ExerciseHorizontalCard(
                 0f, 0f, contrast, 0f, 0f,
                 0f, 0f, 0f, 1f, 0f
             )
-            Image(
-                painter = painterResource(id = exercise.photo),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(exercise.photoUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
@@ -96,7 +103,7 @@ fun ExerciseHorizontalCard(
                 ) {
                     // Informasi Kategori dan Target Otot
                     Text(
-                        text = "${exercise.muscle.name} | ${exercise.category.name} ",
+                        text = "${exercise.muscle?.name} | ${exercise.category?.name} ",
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = neutral30
                         )
@@ -107,9 +114,9 @@ fun ExerciseHorizontalCard(
                     ) {
                         for (i in 1..3) {
                             Icon(
-                                imageVector = if (i <= exercise.level) Icons.Default.Bolt else Icons.Outlined.Bolt,
+                                imageVector = if (i <= exercise?.level ?: 1 ) Icons.Default.Bolt else Icons.Outlined.Bolt,
                                 contentDescription = null,
-                                tint = if (i <= exercise.level) lightblue60 else neutral30,
+                                tint = if (i <= exercise?.level ?: 1 ) lightblue60 else neutral30,
                                 modifier = Modifier.size(19.dp)
                             )
                         }
@@ -120,7 +127,7 @@ fun ExerciseHorizontalCard(
                 Column() {
                     // Nama Latihan
                     Text(
-                        text = exercise.name,
+                        text = exercise?.name ?: "",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = Color.White
                         )
@@ -133,7 +140,7 @@ fun ExerciseHorizontalCard(
                             icon = Icons.Filled.LocalFireDepartment,
                             text = stringResource(
                                 id = R.string.calori_format,
-                                exercise.calEstimation
+                                exercise?.calEstimation ?: 0
                             ),
                             iconTint = lightblue60
                         )
@@ -141,7 +148,7 @@ fun ExerciseHorizontalCard(
                         // Rating
                         ExerciseAdditionInformation(
                             icon = Icons.Filled.Star,
-                            text = stringResource(id = R.string.rating_format, exercise.rating),
+                            text = stringResource(id = R.string.rating_format, exercise?.rating ?: 0),
                             iconTint = lightblue60
                         )
                     }

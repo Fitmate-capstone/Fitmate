@@ -28,14 +28,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.local.faker.FakeData
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.ExerciseData
 import com.tegar.fitmate.ui.theme.FitmateTheme
 import com.tegar.fitmate.ui.theme.lightblue60
 import com.tegar.fitmate.ui.theme.neutral10
@@ -44,7 +48,7 @@ import com.tegar.fitmate.ui.theme.neutral80
 
 
 @Composable
-fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modifier: Modifier = Modifier) {
+fun ExerciseGridCard(exercise: ExerciseData, navigateToDetail: (Long) -> Unit, modifier: Modifier = Modifier) {
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -55,11 +59,14 @@ fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modif
         modifier = modifier
             .width(166.dp)
             .height(197.dp).clickable {
-                navigateToDetail(exercise.id)
+                navigateToDetail(exercise.id?.toLong() ?: 0)
             }
     ) {
-        Image(
-            painter = painterResource(id = exercise.photo),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(exercise.photoUrl)
+                .crossfade(true)
+                .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth().height(104.dp),
@@ -74,7 +81,7 @@ fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modif
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "${exercise.category.name} ",
+                    text = "${exercise.category?.name} ",
                     style = MaterialTheme.typography.labelMedium.copy(
                         color = neutral30
                     )
@@ -85,9 +92,9 @@ fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modif
                 ) {
                     for (i in 1..3) {
                         Icon(
-                            imageVector = if (i <= exercise.level) Icons.Default.Bolt else Icons.Outlined.Bolt,
+                            imageVector = if (i <= (exercise?.level ?: 0)) Icons.Default.Bolt else Icons.Outlined.Bolt,
                             contentDescription = null,
-                            tint = if (i <= exercise.level) lightblue60 else neutral30,
+                            tint = if (i <= (exercise?.level ?: 0)) lightblue60 else neutral30,
                             modifier = Modifier.size(19.dp)
                         )
                     }
@@ -95,7 +102,7 @@ fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modif
             }
 
             Text(
-                text = exercise.name,
+                text = exercise?.name ?: "Exercise name",
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = neutral10,
                     fontWeight = FontWeight.Bold
@@ -109,14 +116,14 @@ fun ExerciseGridCard(exercise: Exercise, navigateToDetail: (Long) -> Unit, modif
                 // Informasi Tambahan
                 ExerciseAdditionInformation(
                     icon = Icons.Filled.LocalFireDepartment,
-                    text = stringResource(id = R.string.calori_format, exercise.calEstimation),
+                    text = stringResource(id = R.string.calori_format, exercise.calEstimation ?: 0),
                     iconTint = lightblue60
                 )
 
                 // Rating
                 ExerciseAdditionInformation(
                     icon = Icons.Filled.Star,
-                    text = stringResource(id = R.string.rating_format, exercise.rating),
+                    text = stringResource(id = R.string.rating_format, exercise?.rating ?: 0),
                     iconTint = lightblue60
                 )
             }

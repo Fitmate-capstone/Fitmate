@@ -88,6 +88,8 @@ import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import com.tegar.fitmate.R
 import com.tegar.fitmate.data.model.Exercise
+import com.tegar.fitmate.data.remote.model.DetailExercise
+import com.tegar.fitmate.data.remote.model.DetailExerciseRespone
 import com.tegar.fitmate.data.util.UiState
 import com.tegar.fitmate.ml.PoseDetectorProcessor
 import com.tegar.fitmate.ui.theme.lightblue60
@@ -119,12 +121,21 @@ fun InteractiveLearnScreen(
 
     when (exerciseState) {
         is UiState.Loading -> {
+
             viewModel.getWorkoutById(workoutId)
+
+
+
 
         }
 
         is UiState.Success -> {
-            val data = (exerciseState as UiState.Success<Exercise>).data
+            val data = (exerciseState as UiState.Success<DetailExerciseRespone>).data
+
+            viewModel.initialateCounter(
+                data.data?.id?.toLong(),
+                data.data?.interactiveSetting?.repetition, data.data?.interactiveSetting?.set
+            )
             when (configuration.orientation) {
                 Configuration.ORIENTATION_LANDSCAPE -> {
                     Row {
@@ -133,21 +144,23 @@ fun InteractiveLearnScreen(
                                 .fillMaxWidth()
                                 .weight(1f),
                         ) {
-                            CameraPreview(
-                                exercise = data,
-                                canPlaySound = soundplayState,
+                            data.data?.let {
+                                CameraPreview(
+                                    exercise = it,
+                                    canPlaySound = soundplayState,
 
-                                resetTimerSound = {
-                                    viewModel.resetTimer()
-                                },
-                                updateCounter = {
-                                    if (uiState.currentSet != maxSet) {
-                                        viewModel.increaseCount()
-                                    }
-                                },
-                                isSafeZone = (uiState.isTutorialScreen || uiState.isInRestMode || uiState.isFinished),
-                                cameraLens = lens
-                            )
+                                    resetTimerSound = {
+                                        viewModel.resetTimer()
+                                    },
+                                    updateCounter = {
+                                        if (uiState.currentSet != maxSet) {
+                                            viewModel.increaseCount()
+                                        }
+                                    },
+                                    isSafeZone = (uiState.isTutorialScreen || uiState.isInRestMode || uiState.isFinished),
+                                    cameraLens = lens
+                                )
+                            }
 
                         }
                         Box(
@@ -442,7 +455,7 @@ fun InteractiveLearnScreen(
                                 Column {
 
                                     GifImage(
-                                        data.Gif
+                                        data.data?.gifUrl ?: ""
                                     )
 
 
@@ -452,6 +465,7 @@ fun InteractiveLearnScreen(
 
                         }
                     }
+
                     ScoreBox(
                         currentRepeation = uiState.counter,
                         maxRepeatition = maxRepetition,
@@ -501,7 +515,7 @@ fun InteractiveLearnScreen(
  */
 @Composable
 fun CameraPreview(
-    exercise: Exercise,
+    exercise: DetailExercise,
     canPlaySound: Boolean,
     resetTimerSound: () -> Unit,
     isSafeZone: Boolean,
@@ -626,37 +640,39 @@ fun CameraPreview(
 }
 
 fun areBodyPartsActive(
-    exercise: Exercise,
+    exercise: DetailExercise,
     rightArmAngle: Double,
     leftArmAngle: Double,
     rightFootAngle: Double,
     leftFootAngle: Double
 ): Boolean {
-    return exercise.bodyPartNeeded.all { bodyPart ->
+
+
+    return exercise.bodyPartNeeded?.all { bodyPart ->
         when (bodyPart) {
             "right_hand" -> isBodyPartActive(
-                exercise.interctiveBodyPartSegmentValue.rightArm,
+                exercise.interactiveBodyPartSegmentValue?.rightArm?.toDouble() ?: 0.0,
                 rightArmAngle
             )
 
             "left_hand" -> isBodyPartActive(
-                exercise.interctiveBodyPartSegmentValue.leftArm,
+                exercise.interactiveBodyPartSegmentValue?.leftArm?.toDouble() ?: 0.0,
                 leftArmAngle
             )
 
             "right_leg" -> isBodyPartActive(
-                exercise.interctiveBodyPartSegmentValue.rightLeg,
+                exercise.interactiveBodyPartSegmentValue?.rightLeg?.toDouble() ?: 0.0,
                 rightFootAngle
             )
 
             "left_leg" -> isBodyPartActive(
-                exercise.interctiveBodyPartSegmentValue.leftLeg,
+                exercise.interactiveBodyPartSegmentValue?.leftLeg?.toDouble() ?: 0.0,
                 leftFootAngle
             )
 
             else -> false
         }
-    }
+    } ?: false
 }
 
 fun isBodyPartActive(requiredValue: Double, detectedValue: Double): Boolean {
@@ -684,7 +700,7 @@ private fun ColoredBorderBox(
 
 @Composable
 fun GifImage(
-    @DrawableRes gif : Int,
+    gif : String,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -833,7 +849,10 @@ fun DetectedPose(
 
 
 
-                Log.d("DETECT", fullBody.toString())
+                Log.d("VALUE FOR RIGHT HAND", right.toString())
+                Log.d("VALUE FOR LEFT HAND", left.toString())
+                Log.d("VALUE FOR Left Foot", leftFoot.toString())
+                Log.d("VALUE FOR Right Foot", rightFoot.toString())
 
                 onRightArmChange(right)
                 onLeftArmChange(left)

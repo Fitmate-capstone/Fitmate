@@ -27,6 +27,15 @@ interface SchenduleExerciseDao {
     @Query("SELECT * FROM schendule_exercise WHERE dateString = :selectedDate AND id_exercise = :exerciseId")
     fun isExerciseAlreadyExist(selectedDate: String,exerciseId : Long): List<SchenduleExerciseEntity>
 
+    @Query("SELECT dateString, COUNT(*) as total_exercise_today, " +
+            "CASE " +
+            "WHEN COUNT(DISTINCT exercise_muscle_target) = 1 THEN GROUP_CONCAT(exercise_muscle_target) " +
+            "WHEN COUNT(DISTINCT exercise_muscle_target) = 2 THEN GROUP_CONCAT(exercise_muscle_target, ' and ') " +
+            "WHEN COUNT(DISTINCT exercise_muscle_target) > 2 THEN 'Mixed' END as muscleTarget, " +
+            "SUM(CAST(isFinished as INTEGER)) as total_exercise_finished, SUM(exercise_calori) as total_calori " +
+            "FROM schendule_exercise WHERE dateString = :date GROUP BY dateString")
+    fun getExerciseSummaryByDate(date: String): TodayExerciseSummary
+
 
     @Insert
     suspend fun insertExercise(exercise: SchenduleExerciseEntity)
@@ -40,3 +49,12 @@ interface SchenduleExerciseDao {
     @Delete
     suspend fun deleteExercise(exercise: SchenduleExerciseEntity)
 }
+
+data class TodayExerciseSummary(
+    val dateString: String,
+    val muscleTarget: String,
+
+    val total_exercise_today: Int,
+    val total_exercise_finished: Int,
+    val total_calori: Int
+)

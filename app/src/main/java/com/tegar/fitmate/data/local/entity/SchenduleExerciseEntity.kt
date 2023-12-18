@@ -19,7 +19,7 @@ data class SchenduleExerciseEntity(
     val exercise_calori: Int,
 
     @ColumnInfo(name = "exercise_gif_url")
-    val exercise_gif_url: Int,
+    val exercise_gif_url: String,
 
     @ColumnInfo(name = "exercise_category")
     val exercise_category: String,
