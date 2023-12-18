@@ -19,6 +19,6 @@ object NotificationStatus {
 
     fun getNotificationStatus(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-        return sharedPreferences.getBoolean(KEY_NOTIFICATION_STATUS, true)
+        return sharedPreferences.getBoolean(KEY_NOTIFICATION_STATUS, false)
     }
 }

@@ -151,7 +151,7 @@ fun HomeScreen(
                             val exerciseSummary = uiState.data
 
                             if (exerciseSummary == TodayExerciseSummary("N/A", "",0, 0, 0)) {
-                                Text("No exercise data available.")
+
                             } else {
                                 Card(
                                     colors = CardDefaults.cardColors(
