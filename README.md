@@ -54,7 +54,9 @@
 ![Detail](https://ik.imagekit.io/akutegar/akutegar/fitmate/detail.png?updatedAt=1702980509261)
 
 
-https://github.com/Fitmate-capstone/Fitmate/assets/59114595/c2d2b3e5-44a7-4dc6-8753-fe30e6dcd84e
+
+
+
 
 
 ![Interactive Screen](https://ik.imagekit.io/akutegar/akutegar/fitmate/interactive_gif_compressed.gif?updatedAt=1702985212059)
