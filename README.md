@@ -11,7 +11,7 @@
 
 ![Home](https://ik.imagekit.io/akutegar/akutegar/fitmate/home.png?updatedAt=1702980369826)
 ![Detail](https://ik.imagekit.io/akutegar/akutegar/fitmate/detail.png?updatedAt=1702980509261)
-![Interactive Screen](https://ik.imagekit.io/akutegar/akutegar/fitmate/interactive_screen.gif?updatedAt=1702981319893)
+![Interactive Screen](https://ik.imagekit.io/akutegar/akutegar/fitmate/interactive_gif.gif?updatedAt=1702982435784)
 ![Schedule Feature](https://ik.imagekit.io/akutegar/akutegar/fitmate/schedule_feature.png?updatedAt=1702980378326)
 ![Notification](https://ik.imagekit.io/akutegar/akutegar/fitmate/notification.png?updatedAt=1702981229938)
 ![Search Equipment](https://ik.imagekit.io/akutegar/akutegar/fitmate/search_equiment.png?updatedAt=1702980454074)
