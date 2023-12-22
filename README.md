@@ -81,6 +81,10 @@ https://youtu.be/73_B8rhTml0
 
 You can download it here:   https://github.com/Fitmate-capstone/Fitmate/releases/tag/v1.0.0 OR https://drive.google.com/file/d/1DIC8ZJVDplnGam6QET0zpJXRGiPygYRU/view
 
+If when installed apk show error "App not installed" , make sure that your device does not block installing apk from outside the playtore or the install from uknown source setting must be allowed.
+
+or another possibility is that your android version does not support using this apk 
+
 
 
 
